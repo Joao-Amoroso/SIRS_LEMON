@@ -6,7 +6,8 @@ DROP TABLE IF EXISTS vehicle;
 
 CREATE TABLE vehicle (
     vehicleid int(11) NOT NULL SERIAL,
-    vehicle_location geography,
+    lat Decimal(8, 6) NOT NULL,
+    lgt Decimal(9, 6) NOT NULL,
     PRIMARY KEY (vehicleid)
 );
 

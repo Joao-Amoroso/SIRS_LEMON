@@ -9,6 +9,7 @@ Lemon's employees also have an internal app to pick up wrongly parked vehicles, 
 # Tecnhologies
 
 -   backend
+    -   postgresql
 -   frontend
 -   api
 
