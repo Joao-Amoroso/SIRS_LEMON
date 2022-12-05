@@ -22,7 +22,7 @@ CREATE TABLE employee(
 DROP TABLE IF EXISTS client;
 
 CREATE TABLE client(
-    clientid int(11) NOT NULL,
+    username varchar(100) NOT NULL,
     pass varchar(100) NOT NULL,
     PRIMARY KEY (clientid)
 );
@@ -33,6 +33,6 @@ CREATE TABLE locked(
     vehicleid INT(11) NOT NULL,
     clientid INT(11) NOT NULL,
     PRIMARY KEY (vehicleid, clientid),
-    FOREIGN KEY (clientid) REFERENCES client (clientid),
+    FOREIGN KEY (clientid) REFERENCES client (username),
     FOREIGN KEY (vehicleid) REFERENCES vehicle (vehicleid)
 );
