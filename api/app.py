@@ -1,7 +1,8 @@
 import psycopg2
 import psycopg2.extras
-from flask import Flask, render_template,request,make_response
+from flask import Flask, render_template, request, make_response, session, redirect, url_for
 import json
+from flask_bcrypt import Bcrypt
 # SGBD configs
 DB_HOST = ""
 DB_USER = ""
@@ -11,11 +12,17 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD)
 
 app = Flask(__name__)
+app.secret_key = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+bcrypt = Bcrypt(app)
 
 
 @app.route("/")
 def hello_world():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
     return render_template('index.html')
+
 
 @app.route('/vehicles')
 def get_vehicles():
@@ -32,7 +39,7 @@ def get_vehicles():
         cursor.execute(query, data)
 
         records = cursor.fetchall()
-        return json.dumps({'data':records })
+        return json.dumps({'data': records})
     except Exception as e:
         return json.dumps({'error': str(e)})
     finally:
@@ -43,7 +50,7 @@ def get_vehicles():
 
 @app.route("/rent", methods=["POST"])
 def rent():
-    #body {"vehicleid"}
+    # body {"vehicleid"}
     dbConn = None
     cursor = None
     try:
@@ -59,8 +66,8 @@ def rent():
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message': 'The vehicle is already rented','code':401})
-        
+            return json.dumps({'message': 'The vehicle is already rented', 'code': 401})
+
         query = """ Insert into locked values ($1,$2);
 """
 
@@ -76,9 +83,11 @@ def rent():
         dbConn.close()
 
 
-@app.route('/signIn',methods=["POST"])
+@app.route('/login', methods=["POST", "GET"])
 def login():
-    #body {username,password}
+    if request.method == "GET":
+        return render_template('login.html')
+    # body {username,password}
     dbConn = None
     cursor = None
     try:
@@ -94,15 +103,15 @@ def login():
         record = cursor.fetchone()
 
         if not record:
-            return json.dumps({'message': "The username doesn't exist",'code':401})
+            return json.dumps({'message': "The username doesn't exist", 'code': 401})
 
-        ## hash password
-        hash_password = body["password"]
+        # hash password
+        hash_password = bcrypt.generate_password_hash(body["password"])
 
-        if hash_password != record[0][0]:
-            return json.dumps({'message': "The password isn't correct",'code':401})
+        if bcrypt.check_password_hash(hash_password, record[0]):
+            return json.dumps({'message': "The password isn't correct", 'code': 401})
 
-        ## generate cookie 
+        # generate cookie
         cookie = "boas"
         resp = make_response(render_template('<h1>cookie was set</h1>'))
         resp.set_cookie('userID', cookie)
@@ -115,9 +124,12 @@ def login():
         cursor.close()
         dbConn.close()
 
-@app.route('/register',methods=["POST"])
+
+@app.route('/register', methods=["POST", "GET"])
 def register():
-    #body {username,password}
+    # body {username,password}
+    if request.method == "GET":
+        return render_template('register.html')
     dbConn = None
     cursor = None
     try:
@@ -133,17 +145,17 @@ def register():
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message': "The username already exists",'code':401})
+            return json.dumps({'message': "The username already exists", 'code': 401})
 
-        ## hash password
-        hash_password = body["password"]
+        # hash password
+        hash_password = bcrypt.generate_password_hash(body["password"])
         query = """ insert into client values ($1,$2);
 """
 
-        data = (body["username"],hash_password)
+        data = (body["username"], hash_password)
         cursor.execute(query, data)
-        
-        ## generate cookie 
+
+        # generate cookie
         cookie = "boas"
         resp = make_response(render_template('<h1>cookie was set</h1>'))
         resp.set_cookie('userID', cookie)
@@ -155,4 +167,3 @@ def register():
         dbConn.commit()
         cursor.close()
         dbConn.close()
-    

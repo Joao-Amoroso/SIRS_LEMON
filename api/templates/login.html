@@ -2,8 +2,14 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            http-equiv="X-UA-Compatible"
+            content="IE=edge"
+        />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -12,41 +18,67 @@
         />
         <title>Lemon</title>
     </head>
-    <body class="container w-100 min-vh-100 mt-5">
+    <body
+        class="container min-vh-100 d-flex justify-content-center align-items-center"
+        style="background-color: #f8fafc"
+    >
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
-        <div class="card p-3 shadow">
-            <h1 class="text-center">Login</h1>
-            <form action="/login" methods="POST">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        class="form-control"
-                    />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        class="form-control"
-                    />
-                </div>
-                <p>
+        <div
+            class="w-100"
+            style="max-width: 400px"
+        >
+            <div class="card p-3 shadow">
+                <h1 class="text-center mb-4">Login</h1>
+                <form
+                    action="/login"
+                    methods="POST"
+                >
+                    <div class="mb-3">
+                        <label
+                            for="username"
+                            class="form-label"
+                            >Username</label
+                        >
+                        <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            class="form-control"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label
+                            for="password"
+                            class="form-label"
+                            >Password</label
+                        >
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control"
+                        />
+                    </div>
+                    <button
+                        class="btn btn-primary w-100 btn-lg mt-1"
+                        type="submit"
+                    >
+                        Login
+                    </button>
+                </form>
+                <p class="text-center w-100 mt-3">
                     Don't have an account?
-                    <a class="link" href="/register">register here</a>
+                    <a
+                        class="link"
+                        href="/register"
+                        >register here</a
+                    >
                 </p>
-                <button class="btn btn-primary w-100 btn-lg" type="submit">
-                    Login
-                </button>
-            </form>
+            </div>
         </div>
     </body>
 </html>
