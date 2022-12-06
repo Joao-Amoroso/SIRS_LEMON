@@ -25,3 +25,4 @@ if you want to run in debug mode write instead
 
 -   psycopg2
 -   flask
+-   flask_bcrypt
