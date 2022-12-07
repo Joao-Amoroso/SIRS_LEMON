@@ -4,11 +4,15 @@
 
 In lemon directory
 
-> npm install
+```bash
+npm install
+```
 
 And to run
 
-> npx expo start
+```bash
+npx expo start
+```
 
 # technologies
 

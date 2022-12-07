@@ -6,17 +6,23 @@ In the **api** directory
 
 ## 1. create an environment
 
-> $ python3 -m venv venv
+```bash
+python3 -m venv venv
+```
 
 ## 2. Active the environment
 
 if you are in linux/macOS
 
-> $ . venv/bin/activate
+```bash
+. venv/bin/activate
+```
 
 if you are in Windows run
 
-> venv\Scripts\activate
+```bash
+venv\Scripts\activate
+```
 
 After this step your shell prompt will change to show the name of the activated environment **"venv"**
 
@@ -24,7 +30,9 @@ After this step your shell prompt will change to show the name of the activated 
 
 For all dependencies in [dependencies](#dependencies) type
 
-> pip install dependency
+```bash
+pip install dependency
+```
 
 # Running the application
 
@@ -36,7 +44,9 @@ flask run
 
 if you want to run in debug mode write instead
 
-> flask --debug run
+```bash
+flask --debug run
+```
 
 # dependencies
 
