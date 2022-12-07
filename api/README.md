@@ -30,7 +30,9 @@ For all dependencies in [dependencies](#dependencies) type
 
 To run the aplication in dev mode write
 
-> flask run
+```bash
+flask run
+```
 
 if you want to run in debug mode write instead
 

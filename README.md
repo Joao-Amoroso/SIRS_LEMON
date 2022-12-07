@@ -6,6 +6,20 @@ Customers can look for and unlock these vehicles through a mobile app or a websi
 
 Lemon's employees also have an internal app to pick up wrongly parked vehicles, which has access to their location through GPS and suggests the best course with Google Maps integration.
 
+# Security Challenges
+
+## 1.
+
+criar um auth server. Ele é responsável pela autenticação
+
+## 2.
+
+criar um bank server.
+
+## 3.
+
+fazer assinatura digital
+
 # Tecnhologies
 
 -   backend
