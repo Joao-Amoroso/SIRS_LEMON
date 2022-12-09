@@ -1,2 +1,3 @@
--   criar auth server
--   criar api
+-   criar auth server - raposo
+-   montar bd - raposo
+-   api
