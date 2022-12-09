@@ -18,8 +18,8 @@ bcrypt = Bcrypt(app)
 
 @app.route("/")
 def hello_world():
-    if "user" not in session:
-        return redirect(url_for("login"))
+    # if "user" not in session:
+    #     return redirect(url_for("login"))
 
     return render_template('index.html')
 
