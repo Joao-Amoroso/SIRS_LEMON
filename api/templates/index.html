@@ -2,14 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta
-            http-equiv="X-UA-Compatible"
-            content="IE=edge"
-        />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-        />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -17,6 +11,39 @@
             crossorigin="anonymous"
         />
         <title>Lemon</title>
+        <style>
+            .loader {
+                width: 1.2em;
+                height: 1.2em;
+                border: 5px solid #fff;
+                border-bottom-color: transparent;
+                border-radius: 50%;
+                display: inline-block;
+                box-sizing: border-box;
+                animation: rotation 1s linear infinite;
+            }
+
+            @keyframes rotation {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .pulse {
+                animation: pulse 1s linear infinite alternate-reverse;
+            }
+            @keyframes pulse {
+                0% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0.6;
+                }
+            }
+        </style>
     </head>
     <body class="bg-light">
         <script
@@ -24,6 +51,8 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
+        <script src="https://unpkg.com/petite-vue"></script>
+
         <header
             class="d-flex justify-content-between py-3 px-4 mb-4 border-bottom shadow-sm bg-dark"
         >
@@ -40,189 +69,340 @@
             <button class="btn btn-primary">Log out</button>
         </header>
         <main class="container w-100 min-vh-100 mb-5">
-            <h1 class="text-center mb-5">Rent a vehicle</h1>
-            <div>
-                <h4 class="mb-3">Travel</h4>
-                <form
-                    class="needs-validation"
-                    novalidate=""
+            <template id="form">
+                <h1 class="text-center mb-5">Rent a vehicle</h1>
+                <div
+                    v-if='generalError != ""'
+                    class="alert alert-danger d-flex align-items-center"
+                    role="alert"
                 >
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label
-                                for="vehicle-id"
-                                class="form-label"
-                                >Vehicle ID
-                            </label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="vehicle-id"
-                                placeholder="Enter vehicle identifier"
-                                required
-                            />
-                        </div>
+                    {{generalError}}
+                </div>
+                <div>
+                    <h4 class="mb-3">Travel</h4>
 
-                        <div class="col-12">
-                            <label
-                                for="duration"
-                                class="form-label"
-                                >Duration</label
-                            >
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="duration"
-                                placeholder="days/hours/minutes"
-                                required
-                            />
-                            <small class="text-muted">1$/10min</small>
-                        </div>
-                    </div>
+                    <form v-on:submit="submit">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="vehicle-id" class="form-label"
+                                    >Vehicle ID
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="vehicle-id"
+                                    placeholder="Enter vehicle identifier"
+                                    required
+                                    :disabled="isLoading"
+                                    v-model="vehicleid"
+                                />
+                                <div
+                                    v-if="vehicleidError"
+                                    class="form-text text-danger"
+                                >
+                                    {{vehicleidError}}
+                                </div>
+                            </div>
 
-                    <hr class="my-4" />
+                            <div class="col-12">
+                                <label for="duration" class="form-label"
+                                    >Duration
+                                    <small class="text-muted"
+                                        >(days/hours/minutes)</small
+                                    ></label
+                                >
 
-                    <h4 class="mb-3">Payment</h4>
-
-                    <div class="my-3">
-                        <div class="form-check">
-                            <input
-                                id="credit"
-                                name="paymentMethod"
-                                type="radio"
-                                class="form-check-input"
-                                checked=""
-                                required=""
-                            />
-                            <label
-                                class="form-check-label"
-                                for="credit"
-                                >Credit card</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                id="debit"
-                                name="paymentMethod"
-                                type="radio"
-                                class="form-check-input"
-                                required=""
-                            />
-                            <label
-                                class="form-check-label"
-                                for="debit"
-                                >Debit card</label
-                            >
-                        </div>
-                        <div class="form-check">
-                            <input
-                                id="paypal"
-                                name="paymentMethod"
-                                type="radio"
-                                class="form-check-input"
-                                required=""
-                            />
-                            <label
-                                class="form-check-label"
-                                for="paypal"
-                                >PayPal</label
-                            >
-                        </div>
-                    </div>
-
-                    <div class="row gy-3">
-                        <div class="col-md-6">
-                            <label
-                                for="cc-name"
-                                class="form-label"
-                                >Name on card</label
-                            >
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="cc-name"
-                                placeholder=""
-                                required=""
-                            />
-                            <small class="text-muted"
-                                >Full name as displayed on card</small
-                            >
-                            <div class="invalid-feedback">
-                                Name on card is required
+                                <!-- <input
+                                    type="text"
+                                    class="form-control"
+                                    id="duration"
+                                    placeholder="days/hours/minutes"
+                                    required
+                                    :disabled="isLoading"
+                                    v-model="duration"
+                                /> -->
+                                <div
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 250px; gap: 0.25rem"
+                                >
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        placeholder="00"
+                                        min="0"
+                                        v-model="durationDays"
+                                        :disabled="isLoading"
+                                        v-on:input="handleChange"
+                                    />
+                                    <span>/</span
+                                    ><input
+                                        type="number"
+                                        class="form-control"
+                                        placeholder="00"
+                                        min="0"
+                                        v-model="durationHours"
+                                        :disabled="isLoading"
+                                        v-on:input="handleChange"
+                                    />
+                                    <span>/</span>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        placeholder="00"
+                                        min="0"
+                                        v-model="durationMinutes"
+                                        :disabled="isLoading"
+                                        v-on:input="handleChange"
+                                    />
+                                </div>
+                                <div
+                                    v-if="durationError"
+                                    class="form-text text-danger"
+                                >
+                                    {{durationError}}
+                                </div>
+                                <small class="text-muted">1$/10min</small>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label
-                                for="cc-number"
-                                class="form-label"
-                                >Credit card number</label
-                            >
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="cc-number"
-                                placeholder=""
-                                required=""
-                            />
-                            <div class="invalid-feedback">
-                                Credit card number is required
+                        <hr class="my-4" />
+
+                        <h4 class="mb-3">Payment</h4>
+
+                        <div class="my-3">
+                            <div class="form-check">
+                                <input
+                                    id="credit"
+                                    name="paymentMethod"
+                                    type="radio"
+                                    class="form-check-input"
+                                    checked=""
+                                    required=""
+                                    value="credit"
+                                    v-model="paymentType"
+                                />
+                                <label class="form-check-label" for="credit"
+                                    >Credit card</label
+                                >
+                            </div>
+                            <div class="form-check">
+                                <input
+                                    id="debit"
+                                    name="paymentMethod"
+                                    type="radio"
+                                    class="form-check-input"
+                                    required=""
+                                    value="debit"
+                                    v-model="paymentType"
+                                />
+                                <label class="form-check-label" for="debit"
+                                    >Debit card</label
+                                >
                             </div>
                         </div>
 
-                        <div class="col-md-3">
-                            <label
-                                for="cc-expiration"
-                                class="form-label"
-                                >Expiration</label
-                            >
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="cc-expiration"
-                                placeholder=""
-                                required=""
-                            />
-                            <div class="invalid-feedback">
-                                Expiration date required
+                        <div class="row gy-3">
+                            <div class="col-md-6">
+                                <label for="cc-name" class="form-label"
+                                    >Name on card</label
+                                >
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="cc-name"
+                                    placeholder=""
+                                    required=""
+                                    :disabled="isLoading"
+                                    v-model="cardName"
+                                />
+                                <small class="text-muted"
+                                    >Full name as displayed on card</small
+                                >
+                                <div class="invalid-feedback">
+                                    Name on card is required
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cc-number" class="form-label"
+                                    >Credit card number</label
+                                >
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="cc-number"
+                                    placeholder="0000 0000 0000 0000"
+                                    required=""
+                                    :disabled="isLoading"
+                                    v-model="cardNumber"
+                                />
+                                <div class="invalid-feedback">
+                                    Credit card number is required
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="cc-expiration" class="form-label"
+                                    >Expiration</label
+                                >
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="cc-expiration"
+                                    placeholder="MM/YY"
+                                    required=""
+                                    :disabled="isLoading"
+                                    v-model="expiration"
+                                />
+                                <div class="invalid-feedback">
+                                    Expiration date required
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="cc-cvv" class="form-label"
+                                    >CVV</label
+                                >
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="999"
+                                    class="form-control"
+                                    id="cc-cvv"
+                                    placeholder="000"
+                                    required=""
+                                    :disabled="isLoading"
+                                    v-model="cvv"
+                                />
+                                <div class="invalid-feedback">
+                                    Security code required
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-3">
-                            <label
-                                for="cc-cvv"
-                                class="form-label"
-                                >CVV</label
-                            >
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="cc-cvv"
-                                placeholder=""
-                                required=""
-                            />
-                            <div class="invalid-feedback">
-                                Security code required
-                            </div>
+                        <div
+                            class="my-3 d-flex align-items-center justify-content-between"
+                        >
+                            <h4>Total Cost:</h4>
+                            <h1 style="word-wrap: break-word">{{total}}</h1>
                         </div>
-                    </div>
 
-                    <div
-                        class="my-3 d-flex align-items-center justify-content-between"
-                    >
-                        <h4>Total Cost:</h4>
-                        <h1>23$</h1>
-                    </div>
+                        <hr class="my-4" />
 
-                    <hr class="my-4" />
-                    <button
-                        class="w-100 btn btn-primary btn-lg"
-                        type="submit"
-                    >
-                        Rent
-                    </button>
-                </form>
-            </div>
+                        <button
+                            class="w-100 btn btn-primary btn-lg"
+                            type="submit"
+                        >
+                            <div
+                                v-if="isLoading"
+                                class="d-flex justify-content-center align-items-center pulse"
+                            >
+                                <span class="loader me-2"></span>
+                                <span>Loading...</span>
+                            </div>
+
+                            <span v-else>Rent</span>
+                        </button>
+                    </form>
+                </div>
+            </template>
+            <div v-scope="Form()"></div>
         </main>
+
+        <script>
+            function Form(props) {
+                return {
+                    $template: "#form",
+                    isLoading: false,
+                    vehicleidError: "",
+                    durationError: "",
+                    generalError: "",
+                    success: false,
+                    vehicleid: "",
+                    durationMinutes: 0,
+                    durationHours: 0,
+                    durationDays: 0,
+                    cardName: "",
+                    expiration: "",
+                    cardNumber: "",
+                    cvv: "",
+                    paymentType: "credit",
+                    total: 0,
+                    format(total) {
+                        const formatter = new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD"
+
+                            // These options are needed to round to whole numbers if that's what you want.
+                            //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+                            //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+                        });
+                        return formatter.format(total);
+                    },
+                    handleChange(e) {
+                        this.total = this.format(
+                            this.computeDurationInMinutes() / 10
+                        );
+                    },
+                    submit(e) {
+                        e.preventDefault();
+
+                        this.isLoading = true;
+                        this.vehicleidError = "";
+                        this.durationError = "";
+                        this.generalError = "";
+
+                        if (
+                            !/^\d\d\/\d\d$/.test(this.expiration) ||
+                            parseInt(this.expiration.slice(0, 2)) > 12
+                        ) {
+                            this.generalError =
+                                "Expiration of card must be MM/YY";
+                            this.isLoading = false;
+                            return;
+                        }
+
+                        let duration = this.computeDurationInMinutes();
+
+                        fetch("/rent", {
+                            method: "POST",
+                            mode: "cors", // no-cors, *cors, same-origin
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                vehicleid: this.vehicleid,
+                                duration: duration,
+                                payment_type: this.paymentType,
+                                name: this.cardName,
+                                card_number: this.cardNumber,
+                                expiration: this.expiration,
+                                cvv: this.cvv
+                            })
+                        })
+                            .then((res) => res.json())
+                            .then((data) => {
+                                console.log("data");
+                                this.isLoading = false;
+                            })
+                            .catch((err) => {
+                                this.generalError = err.message;
+                                this.isLoading = false;
+                            });
+                    },
+
+                    computeDurationInMinutes() {
+                        return (
+                            this.durationMinutes +
+                            this.durationHours * 60 +
+                            this.durationDays * 24 * 60
+                        );
+                    }
+                };
+            }
+            PetiteVue.createApp({
+                Form
+            }).mount();
+        </script>
     </body>
 </html>

@@ -28,6 +28,7 @@ def hello_world():
 
 @app.route('/vehicles/unlocked')
 def get_vehicles():
+
     dbConn = None
     cursor = None
     try:
@@ -40,8 +41,10 @@ def get_vehicles():
         data = ()
         cursor.execute(query, data)
 
-        records = cursor.fetchall()
-        return json.dumps({'data': records})
+        res = []
+        for record in cursor:
+            res.append({"vehicleid": record[0],"lat":record[1],"lgt":record[2]})
+        return json.dumps(res)
     except Exception as e:
         return json.dumps({'error': str(e)})
     finally:
@@ -52,23 +55,61 @@ def get_vehicles():
 
 @app.route("/rent", methods=["POST"])
 def rent():
-    # body {"vehicleid"}
+    """
+    {
+    "vehicleid": "[valid vehicle id]",
+    "duration": "[valid duration in minutes]",
+    "payment_type": "[credit or debit ]",
+    "name": "[name on card]",
+    "card_number": "[card number]",
+    "expiration": "[MM/YY]",
+    "cvv": "[CVV]"
+    }
+    """
+
+
     dbConn = None
     cursor = None
     try:
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         body = request.get_json()
+        query = """
+            SELECT * from vehicle where vehicleid = $1;
+        """
+        data = (body["vehicleid"],)
+
+        cursor.execute(query, data)
+
+        record = cursor.fetchone()
+
+        if not record:
+            return json.dumps({"errors":[{"field":"vehicleid","error":"vehicle doesn't exist"}]}),400
+
+        duration = 0;
+        try:
+            duration = int(body["duration"])
+        except e:
+            return json.dumps({"errors":[{"field":"duration","error":"Duration must be a number"}]}),400
+
+        
+        if duration < 0:
+            return json.dumps({"errors":[{"field":"duration","error":"Duration must be a valid number"}]}),400
+        
+        
+
         query = """ SELECT * from locked where vehicleid = $1;
 """
 
         data = (body["vehicleid"],)
+
+        
         cursor.execute(query, data)
 
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message': 'The vehicle is already rented', 'code': 401})
+            return json.dumps({"errors":[{"field":"rent","error":"Vehicle is already rent"}]}),400
 
         query = """ Insert into locked values ($1,$2);
 """
@@ -76,9 +117,9 @@ def rent():
         data = (body["vehicleid"],)
         cursor.execute(query, data)
 
-        return json.dumps({'message': 'ok'})
+        return json.dumps({'message': 'ok'}),200
     except Exception as e:
-        return json.dumps({'error': str(e)})
+        return json.dumps({"errors":[{"field":"rent","error":"Something went wrong, try again"}]}),500
     finally:
         dbConn.commit()
         cursor.close()
@@ -89,82 +130,10 @@ def rent():
 def login():
 
     return render_template('login.html')
-#     # body {username,password}
-#     dbConn = None
-#     cursor = None
-#     try:
-#         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
-#         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-#         body = request.get_json()
-#         query = """ SELECT * from client where username = $1;
-# """
 
-#         data = (body["username"],)
-#         cursor.execute(query, data)
-
-#         record = cursor.fetchone()
-
-#         if not record:
-#             return json.dumps({'message': "The username doesn't exist", 'code': 401})
-
-#         # hash password
-#         hash_password = bcrypt.generate_password_hash(body["password"])
-
-#         if bcrypt.check_password_hash(hash_password, record[0]):
-#             return json.dumps({'message': "The password isn't correct", 'code': 401})
-
-#         # generate cookie
-#         cookie = "boas"
-#         resp = make_response(render_template('<h1>cookie was set</h1>'))
-#         resp.set_cookie('userID', cookie)
-
-#         return resp
-#     except Exception as e:
-#         return json.dumps({'error': str(e)})
-#     finally:
-#         dbConn.commit()
-#         cursor.close()
-#         dbConn.close()
 
 
 @app.route('/register', methods=["GET"])
 def register():
 
     return render_template('register.html')
-#     dbConn = None
-#     cursor = None
-#     try:
-#         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
-#         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-#         body = request.get_json()
-#         query = """ SELECT * from client where username = $1;
-# """
-
-#         data = (body["username"],)
-#         cursor.execute(query, data)
-
-#         record = cursor.fetchone()
-
-#         if record:
-#             return json.dumps({'message': "The username already exists", 'code': 401})
-
-#         # hash password
-#         hash_password = bcrypt.generate_password_hash(body["password"])
-#         query = """ insert into client values ($1,$2);
-# """
-
-#         data = (body["username"], hash_password)
-#         cursor.execute(query, data)
-
-#         # generate cookie
-#         cookie = "boas"
-#         resp = make_response(render_template('<h1>cookie was set</h1>'))
-#         resp.set_cookie('userID', cookie)
-
-#         return resp
-#     except Exception as e:
-#         return json.dumps({'error': str(e)})
-#     finally:
-#         dbConn.commit()
-#         cursor.close()
-#         dbConn.close()

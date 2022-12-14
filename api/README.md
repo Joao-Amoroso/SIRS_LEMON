@@ -1,5 +1,3 @@
-FORMAT: 1A
-
 # Setup
 
 In the **api** directory
