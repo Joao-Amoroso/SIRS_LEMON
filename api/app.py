@@ -43,7 +43,8 @@ def get_vehicles():
 
         res = []
         for record in cursor:
-            res.append({"vehicleid": record[0],"lat":record[1],"lgt":record[2]})
+            res.append(
+                {"vehicleid": record[0], "lat": record[1], "lgt": record[2]})
         return json.dumps(res)
     except Exception as e:
         return json.dumps({'error': str(e)})
@@ -67,7 +68,6 @@ def rent():
     }
     """
 
-
     dbConn = None
     cursor = None
     try:
@@ -84,32 +84,28 @@ def rent():
         record = cursor.fetchone()
 
         if not record:
-            return json.dumps({"errors":[{"field":"vehicleid","error":"vehicle doesn't exist"}]}),400
+            return json.dumps({"errors": [{"field": "vehicleid", "error": "vehicle doesn't exist"}]}), 400
 
-        duration = 0;
+        duration = 0
         try:
             duration = int(body["duration"])
         except e:
-            return json.dumps({"errors":[{"field":"duration","error":"Duration must be a number"}]}),400
+            return json.dumps({"errors": [{"field": "duration", "error": "Duration must be a number"}]}), 400
 
-        
         if duration < 0:
-            return json.dumps({"errors":[{"field":"duration","error":"Duration must be a valid number"}]}),400
-        
-        
+            return json.dumps({"errors": [{"field": "duration", "error": "Duration must be a valid number"}]}), 400
 
         query = """ SELECT * from locked where vehicleid = $1;
 """
 
         data = (body["vehicleid"],)
 
-        
         cursor.execute(query, data)
 
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({"errors":[{"field":"rent","error":"Vehicle is already rent"}]}),400
+            return json.dumps({"errors": [{"field": "rent", "error": "Vehicle is already rent"}]}), 400
 
         query = """ Insert into locked values ($1,$2);
 """
@@ -117,9 +113,9 @@ def rent():
         data = (body["vehicleid"],)
         cursor.execute(query, data)
 
-        return json.dumps({'message': 'ok'}),200
+        return json.dumps({'message': 'ok'}), 200
     except Exception as e:
-        return json.dumps({"errors":[{"field":"rent","error":"Something went wrong, try again"}]}),500
+        return json.dumps({"errors": [{"field": "rent", "error": "Something went wrong, try again"}]}), 500
     finally:
         dbConn.commit()
         cursor.close()
@@ -130,7 +126,6 @@ def rent():
 def login():
 
     return render_template('login.html')
-
 
 
 @app.route('/register', methods=["GET"])

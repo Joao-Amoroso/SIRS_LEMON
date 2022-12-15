@@ -215,3 +215,6 @@ Redirects to login page
 -   flask
 -   flask_bcrypt
 -   python-dotenv
+-   requests
+-   pytest
+-   bs4

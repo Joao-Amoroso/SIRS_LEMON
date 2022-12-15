@@ -78,7 +78,7 @@
                     class="alert alert-danger d-flex align-items-center"
                     role="alert"
                 >
-                    {{generalError}}
+                    [[generalError]]
                 </div>
                 <div v-if="success">
                     <div
@@ -125,7 +125,7 @@
                                 id="emailHelp"
                                 class="form-text text-danger"
                             >
-                                {{usernameError}}
+                                [[usernameError]]
                             </div>
                         </div>
                         <div class="mb-3">
@@ -147,7 +147,7 @@
                                 id="emailHelp"
                                 class="form-text text-danger"
                             >
-                                {{passwordError}}
+                                [[passwordError]]
                             </div>
                         </div>
                         <button
@@ -223,7 +223,8 @@
                 };
             }
             PetiteVue.createApp({
-                Form
+                Form,
+                $delimiters: ["[[", "]]"]
             }).mount();
         </script>
         <script>
