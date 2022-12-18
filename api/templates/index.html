@@ -71,7 +71,13 @@
                 <span class="text-white">Lemon</span>
             </h1>
 
-            <button class="btn btn-primary">Log out</button>
+            <button
+                v-scope
+                class="btn btn-primary"
+                @click="logout"
+            >
+                Log out
+            </button>
         </header>
         <main class="container w-100 min-vh-100 mb-5">
             <template id="form">
@@ -326,7 +332,10 @@
                     </form>
                 </div>
             </template>
-            <div v-scope="Form()"></div>
+            <div
+                v-scope="Form()"
+                @vue:mounted="checkToken"
+            ></div>
         </main>
         <script src="https://unpkg.com/petite-vue"></script>
         <script>
@@ -358,12 +367,17 @@
                             //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
                             //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
                         });
-                        this.durationDays = parseInt(e.target.value);
+
+                        this.durationDays = isNaN(parseInt(e.target.value))
+                            ? 0
+                            : parseInt(e.target.value);
                         this.total = formatter.format(
                             this.computeDurationInMinutes(
                                 this.durationMinutes,
                                 this.durationHours,
-                                parseInt(e.target.value)
+                                isNaN(parseInt(e.target.value))
+                                    ? 0
+                                    : parseInt(e.target.value)
                             ) / 10
                         );
                         console.log(this.total);
@@ -378,11 +392,15 @@
                             //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
                             //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
                         });
-                        this.durationHours = parseInt(e.target.value);
+                        this.durationHours = isNaN(parseInt(e.target.value))
+                            ? 0
+                            : parseInt(e.target.value);
                         this.total = formatter.format(
                             this.computeDurationInMinutes(
                                 this.durationMinutes,
-                                parseInt(e.target.value),
+                                isNaN(parseInt(e.target.value))
+                                    ? 0
+                                    : parseInt(e.target.value),
                                 this.durationDays
                             ) / 10
                         );
@@ -398,10 +416,14 @@
                             //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
                         });
                         console.log(e.target.value);
-                        this.durationMinutes = parseInt(e.target.value);
+                        this.durationMinutes = isNaN(parseInt(e.target.value))
+                            ? 0
+                            : parseInt(e.target.value);
                         this.total = formatter.format(
                             this.computeDurationInMinutes(
-                                parseInt(e.target.value),
+                                isNaN(parseInt(e.target.value))
+                                    ? 0
+                                    : parseInt(e.target.value),
                                 this.durationHours,
                                 this.durationDays
                             ) / 10
@@ -433,7 +455,10 @@
                             method: "POST",
                             mode: "cors", // no-cors, *cors, same-origin
                             headers: {
-                                "Content-Type": "application/json"
+                                "Content-Type": "application/json",
+                                authorization: `bearer ${localStorage.getItem(
+                                    "lemon-token"
+                                )}`
                             },
                             body: JSON.stringify({
                                 vehicleid: this.vehicleid,
@@ -448,18 +473,33 @@
                             .then((res) => res.json())
                             .then((data) => {
                                 console.log("data");
-                                this.isLoading = false;
                             })
                             .catch((err) => {
                                 this.generalError = err.message;
+                            })
+                            .finally(() => {
                                 this.isLoading = false;
                             });
                     },
 
                     computeDurationInMinutes(minutes, hours, days) {
                         return minutes + hours * 60 + days * 24 * 60;
+                    },
+                    checkToken() {
+                        console.log("corri");
+                        // let token = localStorage.getItem("lemon-token");
+                        // if (token == null) {
+                        //     window.location.href = "/login";
+                        // }
                     }
                 };
+            }
+
+            function logout() {
+                console.log("logout");
+
+                localStorage.removeItem("lemon-token");
+                // window.location.href="/login"
             }
             PetiteVue.createApp({
                 Form,

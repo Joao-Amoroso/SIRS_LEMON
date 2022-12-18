@@ -175,7 +175,10 @@
                     </p>
                 </div>
             </template>
-            <div v-scope="Form()"></div>
+            <div
+                v-scope="Form()"
+                @vue:mounted="checkToken"
+            ></div>
         </div>
         <script>
             function Form(props) {
@@ -211,12 +214,26 @@
                             .then((res) => res.json())
                             .then((data) => {
                                 console.log("data");
-                                this.isLoading = false;
+
+                                localStorage.setItem(
+                                    "lemon-token",
+                                    JSON.stringify(data)
+                                );
+                                window.location.href = "/";
                             })
                             .catch((err) => {
                                 this.generalError = err.message;
+                            })
+                            .finally(() => {
                                 this.isLoading = false;
                             });
+                    },
+                    checkToken() {
+                        console.log("corri");
+                        // let token = localStorage.getItem("lemon-token");
+                        // if (token != null) {
+                        //     window.location.href = "/";
+                        // }
                     }
                 };
             }
@@ -224,15 +241,6 @@
                 Form,
                 $delimiters: ["[[", "]]"]
             }).mount();
-        </script>
-        <script>
-            /*
-            onSubmit {
-                contactar auth server
-                dar set cookie
-            }
-
-            */
         </script>
     </body>
 </html>

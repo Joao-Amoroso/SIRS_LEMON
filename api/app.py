@@ -68,6 +68,12 @@ def rent():
     }
     """
 
+    authorization_header = request.headers["authorization"]
+    if authorization_header[:7] != "Bearer ":
+        return "not authorized", 401
+
+    # check token
+
     dbConn = None
     cursor = None
     try:
