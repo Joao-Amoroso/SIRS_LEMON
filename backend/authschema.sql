@@ -8,7 +8,7 @@ CREATE TABLE client(
     username varchar(100) NOT NULL,
     hashed_password text NOT NULL,
     salt text NOT NULL UNIQUE,
-    PRIMARY KEY (clientid)
+    PRIMARY KEY (username)
 );
 
 DROP TABLE IF EXISTS tokens;
