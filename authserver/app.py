@@ -63,11 +63,7 @@ def login():
         # hashed_pw = SHA3_512.new(body["password"] + salt)
         hashed_pw = hashlib.sha512(str(body["password"] + salt).encode('utf-8')).hexdigest()
 
-        print(record[2])
-        print(hashed_pw)
-
         if hashed_pw != record[2]:
-            print("AAAAAAAAAAA")
             return json.dumps({'message': "The password isn't correct", 'code': 401})
 
 
@@ -91,7 +87,6 @@ def register():
 
     try :
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
-        print("conexao")
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         body = request.get_json()
