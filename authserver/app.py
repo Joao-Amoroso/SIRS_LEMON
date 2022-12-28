@@ -2,10 +2,10 @@ import psycopg2
 import psycopg2.extras
 from flask import Flask, request
 import json
-from flask_bcrypt import Bcrypt
 import jwt
 from datetime import datetime
 import secrets
+import hashlib
 
 # jwt configs
 SECRET_KEY = "a"
@@ -26,34 +26,15 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (
 
 app = Flask(__name__)
 
-bcrypt = Bcrypt(app)
 
-
-def createToken():
-    """
-    {
-    "start-time" : 
-    "duration" :
-    "token" : 
-    }
-    """
+def createToken(id):
     data_token = {
-            "start-time" : datetime.now(),
-            "duration" : TOKEN_DURATION,
+            "sub" : id,
+            "exp" : datetime.now() + datetime.timedelta(TOKEN_DURATION),
     }
-
-    token = secrets.token_bytes(TOKEN_BYTES)
-    data_token.update( {"token" : token})
     return json.dumps(data_token, indent=4)
     
 
-@app.route('/')
-def teste():
-    return "pixas e lavagantes"
-# body{
-#   username,
-#   hashed password
-# }
 @app.route('/login',methods=["POST"])
 def login():
 
@@ -66,7 +47,7 @@ def login():
 
         body = request.get_json()
 
-        query = """SELECT hashed_password FROM client WHERE username =  $1;"""
+        query = """SELECT * FROM client WHERE username =  %s;"""
         data = (body["username"],)
 
         cursor.execute(query, data)
@@ -76,21 +57,18 @@ def login():
         if not record:
             return json.dumps({'message' : 'Username does not exist', 'code' : '401'})
 
-        if not bcrypt.check_password_hash(body["password"], record["password"]):
+        salt = record["salt"]
+        hashed_pw = hashlib.sha512(body["password"] + salt)
+        
+
+        if hashed_pw != record["password"]:
             return json.dumps({'message': "The password isn't correct", 'code': 401})
 
 
-        json_token = createToken()
-    
-        query = """"INSERT INTO tokens (username, token) VALUES ($1,$2);"""
+        json_token = createToken(record["id"])
 
-        record_to_insert = (body["username"], json_token["token"])
-
-        cursor.execute(query, record_to_insert)
-
-        jwt_encoded = jwt.encode(json_token, SECRET_KEY, ALGORITHM)
-       
-        # devolver json     
+        return jwt.encode(json_token, SECRET_KEY, ALGORITHM)
+         
         
     except Exception as e:
         return json.dumps({'error' : e})
@@ -99,19 +77,6 @@ def login():
         cursor.close()
         dbConn.close()
 
-    
-
-    return "teste"
-    # hash password
-    # confirmar password com bd
-    # criar token
-    # associar token a user
-    # devolver token do user
-
-# body{
-#   username,
-#   hashed password
-# }
 @app.route('/register',methods=["POST"])
 def register():
 
@@ -124,7 +89,7 @@ def register():
 
         body = request.get_json()
 
-        query = """SELECT * FROM client WHERE username =  $1;"""
+        query = """SELECT * FROM client WHERE username =  %s;"""
         data = (body["username"],)
 
         cursor.execute(query, data)
@@ -134,15 +99,19 @@ def register():
         if record :
             return json.dumps({'message' : 'User already exists', 'code' : '401'})
 
-        query = """INSERT INTO client (username, hashed_password, salt) VALUES ($1,$2,$3)"""
 
-        #to remove salt (password already comes with salt (?))
-        record_to_insert = (body["username"], body["password"], "salt")
+        query = """INSERT INTO client (username, id, hashed_password, salt) VALUES (%s, %s, %s, %s)"""
+
+        id = secrets.token_hex(64)
+        salt = secrets.token_hex(64)
+
+        hashed_pw = hashlib.sha512(body["password"] + salt)
+
+        record_to_insert = (body["username"], id, hashed_pw, salt)
 
         cursor.execute(query, record_to_insert)
 
-        # login?
-
+        
 
     except Exception as e:
         return json.dumps({'error' : e})
@@ -150,23 +119,6 @@ def register():
         dbConn.commit()
         cursor.close()
         dbConn.close()
-
-
-    # verificar se user existe
-    # hash password
-    # criar user
-    # associar token a user
-    # devolver token do user
-    pass
-
-# body{
-#   token,
-# }
-@app.route('/user',methods=["POST"])
-def is_user():
-    # verificar se token existe
-    pass
-
 
 
 if __name__ == "__main__":
