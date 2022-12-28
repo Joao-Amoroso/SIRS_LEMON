@@ -3,9 +3,10 @@ import psycopg2.extras
 from flask import Flask, request
 import json
 import jwt
-from datetime import datetime
+from datetime import datetime, timedelta
 import secrets
 from Crypto.Hash import SHA3_512
+import hashlib
 
 # jwt configs
 SECRET_KEY = "a"
@@ -14,15 +15,16 @@ ALGORITHM = "HS256"
 
 # token configs
 TOKEN_BYTES = 16
-TOKEN_DURATION = 86400
+TOKEN_DURATION = 60
 
 # SGBD configs
-DB_HOST = ""
-DB_USER = ""
-DB_DATABASE = ""
-DB_PASSWORD = ""
-DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (
-    DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD)
+DB_HOST = "localhost"
+DB_USER = "postgres"
+DB_DATABASE = "postgres"
+DB_PASSWORD = "postgres"
+DB_PORT = "5432"
+DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
+    DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
 app = Flask(__name__)
 
@@ -30,9 +32,9 @@ app = Flask(__name__)
 def createToken(id):
     data_token = {
             "sub" : id,
-            "exp" : datetime.now() + datetime.timedelta(TOKEN_DURATION),
+            "exp" : datetime.now() + timedelta(minutes=TOKEN_DURATION),
     }
-    return json.dumps(data_token, indent=4)
+    return data_token
     
 
 @app.route('/login',methods=["POST"])
@@ -58,10 +60,14 @@ def login():
             return json.dumps({'message' : 'Username does not exist', 'code' : '401'})
 
         salt = record[3]
-        hashed_pw = SHA3_512(body["password"] + salt)
-        
+        # hashed_pw = SHA3_512.new(body["password"] + salt)
+        hashed_pw = hashlib.sha512(str(body["password"] + salt).encode('utf-8')).hexdigest()
+
+        print(record[2])
+        print(hashed_pw)
 
         if hashed_pw != record[2]:
+            print("AAAAAAAAAAA")
             return json.dumps({'message': "The password isn't correct", 'code': 401})
 
 
@@ -85,6 +91,7 @@ def register():
 
     try :
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+        print("conexao")
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         body = request.get_json()
@@ -97,7 +104,7 @@ def register():
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message' : 'User already exists', 'code' : '401'})
+            return json.dumps({'message' : 'User already exists', 'code' : '401'})  
 
 
         query = """INSERT INTO client (username, id, hashed_password, salt) VALUES (%s, %s, %s, %s)"""
@@ -105,12 +112,15 @@ def register():
         id = secrets.token_hex(64)
         salt = secrets.token_hex(64)
 
-        hashed_pw = SHA3_512(body["password"] + salt)
+        #hashed_pw = SHA3_512.new(body["password"] + salt)
+        hashed_pw = hashlib.sha512(str(body["password"] + salt).encode('utf-8')).hexdigest()
+
 
         record_to_insert = (body["username"], id, hashed_pw, salt)
 
         cursor.execute(query, record_to_insert)
 
+        return
         
 
     except Exception as e:
