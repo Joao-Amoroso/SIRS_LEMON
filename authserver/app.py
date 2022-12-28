@@ -5,7 +5,7 @@ import json
 import jwt
 from datetime import datetime
 import secrets
-import hashlib
+from Crypto.Hash import SHA3_512
 
 # jwt configs
 SECRET_KEY = "a"
@@ -57,15 +57,15 @@ def login():
         if not record:
             return json.dumps({'message' : 'Username does not exist', 'code' : '401'})
 
-        salt = record["salt"]
-        hashed_pw = hashlib.sha512(body["password"] + salt)
+        salt = record[3]
+        hashed_pw = SHA3_512(body["password"] + salt)
         
 
-        if hashed_pw != record["password"]:
+        if hashed_pw != record[2]:
             return json.dumps({'message': "The password isn't correct", 'code': 401})
 
 
-        json_token = createToken(record["id"])
+        json_token = createToken(record[1])
 
         return jwt.encode(json_token, SECRET_KEY, ALGORITHM)
          
@@ -96,7 +96,7 @@ def register():
 
         record = cursor.fetchone()
 
-        if record :
+        if record:
             return json.dumps({'message' : 'User already exists', 'code' : '401'})
 
 
@@ -105,7 +105,7 @@ def register():
         id = secrets.token_hex(64)
         salt = secrets.token_hex(64)
 
-        hashed_pw = hashlib.sha512(body["password"] + salt)
+        hashed_pw = SHA3_512(body["password"] + salt)
 
         record_to_insert = (body["username"], id, hashed_pw, salt)
 
