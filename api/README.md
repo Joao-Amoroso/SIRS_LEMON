@@ -55,6 +55,7 @@ All routes that the api handles
 -   **[home](#get])** : `GET /`
 -   **[rent](#post-rent)** : `POST /rent`
 -   **[get vehicles unlocked](#get-vehiclesunlocked)** : `GET /vehicles/unlocked`
+-   **[update vehicle position](#put-vehiclesposition)** : `PUT /vehicles/position`
 
 # GET /login
 
@@ -199,8 +200,8 @@ Example
     },
     {
         "vehicleid": "vyh344",
-        "lat": "38.745548",
-        "lgt": "-9.147874"
+        "lat": 38.745548,
+        "lgt": -9.147874
     }
 ]
 ```
@@ -209,11 +210,52 @@ Example
 
 Redirects to login page
 
+# PUT /vehicles/position
+
+Updates a vehicle position
+
+## Request
+
+Data Constraints
+
+```json
+{
+    "position": {
+        "lat": "[valid latitude]",
+        "lgt": "[valid longitude]"
+    },
+    "id": "[vehicle id]",
+    "hmac": "[signature]"
+}
+```
+
+Example
+
+```json
+{
+    "position": {
+        "lat": 38.745548,
+        "lgt": -9.147874
+    },
+    "id": "hfisd",
+    "hmac": "gdsjiodgsijkgdskgdsnklgmsdlsgdml"
+}
+```
+
+## Response
+
+### **code**: `200 OK`
+
+### **code**: `401 Unauthorized`
+
+### **code**: `400 BAD Request`
+
 # dependencies
 
 -   psycopg2
 -   flask
--   flask_bcrypt
+-   pyjwt
+-   hmac
 -   python-dotenv
 -   requests
 -   pytest
