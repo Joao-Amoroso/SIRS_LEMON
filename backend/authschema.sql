@@ -6,18 +6,10 @@ DROP TABLE IF EXISTS client;
 
 CREATE TABLE client(
     username varchar(100) NOT NULL,
+    id text NOT NULL,
     hashed_password text NOT NULL,
     salt text NOT NULL UNIQUE,
     PRIMARY KEY (username)
-);
-
-DROP TABLE IF EXISTS tokens;
-
-CREATE TABLE tokens(
-    username varchar(100) NOT NULL,
-    token text NOT NULL,
-    PRIMARY KEY (username),
-    FOREIGN KEY (username) REFERENCES client (username)
 );
 
 -- CREATE PROCEDURE dbo.uspAddUser
