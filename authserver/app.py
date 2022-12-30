@@ -1,12 +1,12 @@
 import psycopg2
 import psycopg2.extras
-from flask import Flask, request
+from flask import Flask, request, redirect
 import json
 import jwt
 from datetime import datetime, timedelta
 import secrets
-from Crypto.Hash import SHA3_512
-import hashlib
+from argon2 import low_level
+import base64
 
 # jwt configs
 SECRET_KEY = "a"
@@ -14,7 +14,7 @@ ALGORITHM = "HS256"
 
 
 # token configs
-TOKEN_BYTES = 16
+TOKEN_BYTES = 64
 TOKEN_DURATION = 60
 
 # SGBD configs
@@ -36,6 +36,16 @@ def createToken(id):
     }
     return data_token
     
+# @app.before_request
+# def before_request():
+#     if not request.is_secure:
+#         url = request.url.replace('http://', 'https://', 1)
+#         code = 301
+#         return redirect(url, code=code)
+
+@app.route('/', methods=["GET"])
+def teste():
+    return "OLAAA"
 
 @app.route('/login',methods=["POST"])
 def login():
@@ -60,8 +70,11 @@ def login():
             return json.dumps({'message' : 'Username does not exist', 'code' : '401'})
 
         salt = record[3]
-        # hashed_pw = SHA3_512.new(body["password"] + salt)
-        hashed_pw = hashlib.sha512(str(body["password"] + salt).encode('utf-8')).hexdigest()
+            
+        pw_bytes = bytes(body["password"], 'utf-8')
+
+        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4,hash_len=64)
+        hashed_pw = base64.b64encode(byte_hashed_pw).decode("utf-8")
 
         if hashed_pw != record[2]:
             return json.dumps({'message': "The password isn't correct", 'code': 401})
@@ -104,18 +117,18 @@ def register():
 
         query = """INSERT INTO client (username, id, hashed_password, salt) VALUES (%s, %s, %s, %s)"""
 
-        id = secrets.token_hex(64)
-        salt = secrets.token_hex(64)
+        id = secrets.token_hex(TOKEN_BYTES)
+        salt = secrets.token_hex(TOKEN_BYTES)
+        pw_bytes = bytes(body["password"], 'utf-8')
 
-        #hashed_pw = SHA3_512.new(body["password"] + salt)
-        hashed_pw = hashlib.sha512(str(body["password"] + salt).encode('utf-8')).hexdigest()
-
+        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4,hash_len=64)
+        hashed_pw = base64.b64encode(byte_hashed_pw).decode("utf-8")
 
         record_to_insert = (body["username"], id, hashed_pw, salt)
 
         cursor.execute(query, record_to_insert)
 
-        return
+        return json.dumps({'message': 'ok'}), 200
         
 
     except Exception as e:
