@@ -5,7 +5,6 @@ from flask import Flask, render_template, request, make_response, session, redir
 
 import json
 
-from dotenv import load_dotenv
 import os
 
 import hmac
@@ -13,14 +12,18 @@ import jwt
 
 import datetime
 
-load_dotenv()
 
 # SGBD configs
-DB_HOST = os.environ.get("DB_HOST")
-DB_USER = os.environ.get("DB_USER")
-DB_DATABASE = os.environ.get("DB_DATABASE")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-DB_PORT = 5433
+# DB_HOST = os.environ.get("DB_HOST")
+# DB_USER = os.environ.get("DB_USER")
+# DB_DATABASE = os.environ.get("DB_DATABASE")
+# DB_PASSWORD = os.environ.get("DB_PASSWORD")
+# DB_PORT = 5433
+DB_HOST = "localhost"
+DB_USER = "postgres"
+DB_DATABASE = "postgres"
+DB_PASSWORD = "postgres"
+DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD,DB_PORT)
 
@@ -260,3 +263,9 @@ def login():
 def register():
 
     return render_template('register.html')
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

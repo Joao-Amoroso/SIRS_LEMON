@@ -1,6 +1,6 @@
 DROP DATABASE IF EXISTS auth_lemon;
 
-CREATE DATABASE IF NOT EXISTS auth_lemon;
+CREATE DATABASE  auth_lemon;
 
 DROP TABLE IF EXISTS client;
 

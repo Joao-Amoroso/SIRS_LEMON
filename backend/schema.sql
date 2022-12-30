@@ -1,6 +1,6 @@
 DROP DATABASE IF EXISTS lemon;
 
-CREATE DATABASE IF NOT EXISTS lemon;
+CREATE DATABASE lemon;
 
 DROP TABLE IF EXISTS vehicle;
 
@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS locked;
 CREATE TABLE locked(
     vehicleid text NOT NULL,
     clientid text NOT NULL,
-    started_at datetime NOT NULL,
+    started_at timestamp NOT NULL,
     duration int NOT NULL,
     PRIMARY KEY (vehicleid),
     FOREIGN KEY (vehicleid) REFERENCES vehicle (vehicleid)
