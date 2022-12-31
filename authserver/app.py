@@ -1,6 +1,6 @@
 import psycopg2
 import psycopg2.extras
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 import json
 import jwt
 from datetime import datetime, timedelta
@@ -29,13 +29,14 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
 app = Flask(__name__)
 
 
-def createToken(id):
+def createToken(id, nonce):
     data_token = {
-            "sub" : id,
-            "exp" : datetime.now() + timedelta(minutes=TOKEN_DURATION),
+        "sub": id,
+        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION),
+        "nonce": nonce
     }
     return data_token
-    
+
 # @app.before_request
 # def before_request():
 #     if not request.is_secure:
@@ -43,12 +44,13 @@ def createToken(id):
 #         code = 301
 #         return redirect(url, code=code)
 
-@app.route('/', methods=["GET"])
-def teste():
-    return "OLAAA"
 
-@app.route('/login',methods=["POST"])
+@app.route('/login', methods=["POST", "GET"])
 def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    # nonce
 
     dbConn = None
     cursor = None
@@ -67,38 +69,41 @@ def login():
         record = cursor.fetchone()
 
         if not record:
-            return json.dumps({'message' : 'Username does not exist', 'code' : '401'})
+            return json.dumps({'message': 'Username does not exist', 'code': '401'})
 
         salt = record[3]
-            
+
         pw_bytes = bytes(body["password"], 'utf-8')
 
-        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4,hash_len=64)
+        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(
+            salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4, hash_len=64)
         hashed_pw = base64.b64encode(byte_hashed_pw).decode("utf-8")
 
         if hashed_pw != record[2]:
             return json.dumps({'message': "The password isn't correct", 'code': 401})
 
+        json_token = createToken(record[1], body["nonce"])
 
-        json_token = createToken(record[1])
+        return render_template("login_redirect.html", url="", token=jwt.encode(json_token, SECRET_KEY, ALGORITHM))
 
-        return jwt.encode(json_token, SECRET_KEY, ALGORITHM)
-         
-        
     except Exception as e:
-        return json.dumps({'error' : e})
+        return json.dumps({'error': e})
     finally:
         dbConn.commit()
         cursor.close()
         dbConn.close()
 
-@app.route('/register',methods=["POST"])
+
+@app.route('/register', methods=["POST", "GET"])
 def register():
+
+    if request.method == "GET":
+        return render_template("register.html")
 
     dbConn = None
     cursor = None
 
-    try :
+    try:
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -112,8 +117,7 @@ def register():
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message' : 'User already exists', 'code' : '401'})  
-
+            return json.dumps({'message': 'User already exists', 'code': '401'})
 
         query = """INSERT INTO client (username, id, hashed_password, salt) VALUES (%s, %s, %s, %s)"""
 
@@ -121,7 +125,8 @@ def register():
         salt = secrets.token_hex(TOKEN_BYTES)
         pw_bytes = bytes(body["password"], 'utf-8')
 
-        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4,hash_len=64)
+        byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(
+            salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4, hash_len=64)
         hashed_pw = base64.b64encode(byte_hashed_pw).decode("utf-8")
 
         record_to_insert = (body["username"], id, hashed_pw, salt)
@@ -129,10 +134,9 @@ def register():
         cursor.execute(query, record_to_insert)
 
         return json.dumps({'message': 'ok'}), 200
-        
 
     except Exception as e:
-        return json.dumps({'error' : e})
+        return json.dumps({'error': e})
     finally:
         dbConn.commit()
         cursor.close()
@@ -140,6 +144,4 @@ def register():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,port=80)
-
-    
+    app.run(debug=True, port=80)

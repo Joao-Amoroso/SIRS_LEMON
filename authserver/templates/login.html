@@ -65,7 +65,7 @@
             style="max-width: 400px"
         >
             <h1 class="d-flex justify-content-center align-items-center mb-3">
-                Lemon
+                Auth
             </h1>
             <h1 class="text-center mb-4">Login</h1>
             <template id="form">
@@ -101,12 +101,51 @@
                     </div>
                 </div>
                 <div v-else>
-                    <!-- TODO: por url -->
-                    <form
-                        v-on:submit="submit"
-                        method="post"
-                        action="{{auth_url}}"
-                    >
+                    <form v-on:submit="submit">
+                        <div class="mb-3">
+                            <label
+                                for="username"
+                                class="form-label"
+                                >Username</label
+                            >
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                class="form-control"
+                                :disabled="isLoading"
+                                v-model="username"
+                            />
+                            <div
+                                v-if="usernameError"
+                                id="emailHelp"
+                                class="form-text text-danger"
+                            >
+                                [[usernameError]]
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label
+                                for="password"
+                                class="form-label"
+                                >Password</label
+                            >
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="form-control"
+                                :disabled="isLoading"
+                                v-model="password"
+                            />
+                            <div
+                                v-if="passwordError"
+                                id="emailHelp"
+                                class="form-text text-danger"
+                            >
+                                [[passwordError]]
+                            </div>
+                        </div>
                         <button
                             class="btn btn-primary w-100 btn-lg mt-1"
                             type="submit"
