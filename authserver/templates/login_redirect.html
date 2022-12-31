@@ -33,9 +33,15 @@
             <h1 class="text-center mb-4">Login was successfull</h1>
 
             <form
-                action=""
+                action="{{ url }}"
                 method="post"
+                id="form"
             >
+                <input
+                    type="hidden"
+                    name="token"
+                    value="{{token}}"
+                />
                 <button
                     type="submit"
                     class="btn btn-primary w-100 btn-lg mt-1"

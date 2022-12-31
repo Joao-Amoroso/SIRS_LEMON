@@ -17,39 +17,6 @@
             crossorigin="anonymous"
         />
         <title>Lemon - login</title>
-        <style>
-            .loader {
-                width: 1.2em;
-                height: 1.2em;
-                border: 5px solid #fff;
-                border-bottom-color: transparent;
-                border-radius: 50%;
-                display: inline-block;
-                box-sizing: border-box;
-                animation: rotation 1s linear infinite;
-            }
-
-            @keyframes rotation {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
-            .pulse {
-                animation: pulse 1s linear infinite alternate-reverse;
-            }
-            @keyframes pulse {
-                0% {
-                    opacity: 1;
-                }
-                100% {
-                    opacity: 0.6;
-                }
-            }
-        </style>
     </head>
     <body
         class="container min-vh-100 d-flex justify-content-center align-items-center bg-light"
@@ -59,148 +26,44 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
-        <script src="https://unpkg.com/petite-vue"></script>
         <div
             class="w-100"
             style="max-width: 400px"
         >
             <h1 class="d-flex justify-content-center align-items-center mb-3">
-                Lemon
+                <img
+                    style="width: 1.9em; height: 1.9em"
+                    src="/static/lemon.png"
+                    alt=""
+                />
             </h1>
             <h1 class="text-center mb-4">Login</h1>
-            <template id="form">
-                <div
-                    v-if='generalError != ""'
-                    class="alert alert-danger d-flex align-items-center"
-                    role="alert"
+
+            <!-- TODO: por url -->
+            <form
+                method="post"
+                action="{{auth_url}}"
+            >
+                <button
+                    class="btn btn-primary w-100 btn-lg mt-1 d-flex align-items-center justify-content-center"
+                    type="submit"
                 >
-                    [[generalError]]
-                </div>
-                <div v-if="success">
-                    <div
-                        class="alert alert-success d-flex align-items-center"
-                        role="alert"
-                    >
-                        <h4
-                            class="d-flex justify-content-center align-items-center"
-                        >
-                            <svg
-                                class="bi flex-shrink-0 me-2"
-                                role="img"
-                                aria-label="Success:"
-                                viewBox="0 0 16 16"
-                                style="height: 1.2em; width: 1.2em"
-                                fill="#0f5132"
-                            >
-                                <path
-                                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
-                                />
-                            </svg>
-                            The Login was successfull
-                        </h4>
-                    </div>
-                </div>
-                <div v-else>
-                    <!-- TODO: por url -->
-                    <form
-                        v-on:submit="submit"
-                        method="post"
-                        action="{{auth_url}}"
-                    >
-                        <button
-                            class="btn btn-primary w-100 btn-lg mt-1"
-                            type="submit"
-                            :disabled="isLoading"
-                        >
-                            <div
-                                v-if="isLoading"
-                                class="d-flex justify-content-center align-items-center pulse"
-                            >
-                                <span class="loader me-2"></span>
-                                <span>Loading...</span>
-                            </div>
-
-                            <span v-else>Login</span>
-                        </button>
-                    </form>
-                    <p class="text-center w-100 mt-3">
-                        Don't have an account?
-                        <a
-                            class="link"
-                            href="/register"
-                            >register here</a
-                        >
-                    </p>
-                </div>
-            </template>
-            <div
-                v-scope="Form()"
-                @vue:mounted="checkToken"
-            ></div>
+                    <img
+                        src="/static/shield.png"
+                        style="width: 1.5em; height: 1.5em; margin-right: 10px"
+                        alt=""
+                    />
+                    Auth
+                </button>
+            </form>
+            <p class="text-center w-100 mt-3">
+                Don't have an account?
+                <a
+                    class="link"
+                    href="/register"
+                    >register here</a
+                >
+            </p>
         </div>
-
-        <script>
-            function Form(props) {
-                return {
-                    $template: "#form",
-                    isLoading: false,
-                    usernameError: "",
-                    passwordError: "",
-                    generalError: "",
-                    success: false,
-                    username: "",
-                    password: "",
-                    submit(e) {
-                        e.preventDefault();
-
-                        localStorage.setItem("lemon-token", "token");
-                        return;
-                        this.isLoading = true;
-                        this.usernameError = "";
-                        this.passwordError = "";
-                        this.generalError = "";
-
-                        fetch("/login", {
-                            method: "POST",
-                            mode: "cors", // no-cors, *cors, same-origin
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                username: this.username,
-                                password: this.password
-                            })
-                        })
-                            .then((res) => res.json())
-                            .then((data) => {
-                                console.log("data");
-
-                                localStorage.setItem(
-                                    "lemon-token",
-                                    JSON.stringify(data)
-                                );
-                                window.location.href = "/";
-                            })
-                            .catch((err) => {
-                                this.generalError = err.message;
-                            })
-                            .finally(() => {
-                                this.isLoading = false;
-                            });
-                    },
-                    checkToken() {
-                        console.log("corri");
-                        // let token = localStorage.getItem("lemon-token");
-                        // if (token != null) {
-                        //     window.location.href = "/";
-                        // }
-                    }
-                };
-            }
-            PetiteVue.createApp({
-                Form,
-                $delimiters: ["[[", "]]"]
-            }).mount();
-        </script>
     </body>
 </html>
