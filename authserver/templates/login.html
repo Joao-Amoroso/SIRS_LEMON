@@ -135,6 +135,16 @@
                 </div>
                 <div v-else>
                     <form v-on:submit="submit">
+                        <input
+                            type="hidden"
+                            name="nonce"
+                            value="{{nonce}}"
+                        />
+                        <input
+                            type="hidden"
+                            name="origin"
+                            value="{{origin}}"
+                        />
                         <div class="mb-3">
                             <label
                                 for="username"
@@ -240,7 +250,9 @@
                             },
                             body: JSON.stringify({
                                 username: this.username,
-                                password: this.password
+                                password: this.password,
+                                nonce: "{{nonce}}",
+                                origin: "{{origin}}"
                             })
                         })
                             .then((res) => res.json())

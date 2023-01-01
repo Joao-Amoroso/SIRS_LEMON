@@ -45,12 +45,15 @@ def createToken(id, nonce):
 #         return redirect(url, code=code)
 
 
-@app.route('/login', methods=["POST", "GET"])
-def login():
-    if request.method == "GET":
-        return render_template("login.html")
+@app.route('/login-page', methods=["POST"])
+def login_page():
+    if "origin" not in request.form or "nonce" not in request.form:
+        return "bad request", 400
+    return render_template("login.html", origin=request.form["origin"], nonce=request.form["nonce"])
 
-    # nonce
+
+@app.route('/login', methods=["POST"])
+def login():
 
     dbConn = None
     cursor = None
@@ -84,7 +87,7 @@ def login():
 
         json_token = createToken(record[1], body["nonce"])
 
-        return render_template("login_redirect.html", url="", token=jwt.encode(json_token, SECRET_KEY, ALGORITHM))
+        return render_template("login_redirect.html", url=body["origin"], token=jwt.encode(json_token, SECRET_KEY, ALGORITHM))
 
     except Exception as e:
         return json.dumps({'error': e})

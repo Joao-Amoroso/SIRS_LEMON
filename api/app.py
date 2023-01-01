@@ -3,15 +3,21 @@ import psycopg2
 import psycopg2.extras
 from flask import Flask, render_template, request, make_response, session, redirect, url_for, jsonify
 
+from secrets import token_hex
+
 import json
 
 import os
 
 import hmac
 import jwt
+from datetime import datetime, timedelta
 
-import datetime
 
+# libraries for schedule scriupt
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # SGBD configs
 # DB_HOST = os.environ.get("DB_HOST")
@@ -34,11 +40,44 @@ AUTH_KEY = os.environ.get("AUTH_KEY")
 app = Flask(__name__)
 
 
+###############
+#  CONSTANTS  #
+###############
+
+
 NOT_AUTHORIZED = 401
 BAD_REQUEST = 400
 ALGORITHM = "HS256"
 
+# token configs
+TOKEN_BYTES = 64
+TOKEN_DURATION = 60
+TOKEN_SECRET = "7D1E6FC189DAFB2824448B277E11B"
+
+
+NONCE_DURATION = 10  # minutes
+
+
 AUTH_URL = ""
+
+nonces = {}
+
+
+def check_nonces():
+    global nonces
+    date_now = datetime.now()
+    nonces.pop
+    for key in nonces.keys():
+        if date_now > nonces[key]:
+            del nonces[key]
+
+
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(func=check_nonces, trigger="interval", minutes=3)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 
 @app.route("/")
@@ -133,8 +172,8 @@ def rent():
     token = authorization_header[7:]
     id = ""
     try:
-        decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],
-                                                                  "verify_signature": True, "verify_exp": True})
+        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
+                                                                      "verify_signature": True, "verify_exp": True})
         id = decoded["sub"]
     except Exception:
         return "not authorized", NOT_AUTHORIZED
@@ -256,8 +295,10 @@ def vehicles_position():
 
 @app.route('/login', methods=["GET"])
 def login():
+    nonce = token_hex(16)
 
-    return render_template('login.html', auth_url="")
+    nonces[nonce] = datetime.now()+timedelta(minutes=NONCE_DURATION)
+    return render_template('login.html', auth_url="", nonce=nonce, origin=url_for(home))
 
 
 @app.route('/register', methods=["GET"])
@@ -266,13 +307,47 @@ def register():
     return render_template('register.html')
 
 
+def createToken(id):
+    data_token = {
+        "sub": id,
+        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION)
+    }
+    return data_token
+
+
 @app.route('/SSO', methods=["POST"])
 def sso():
+    if "token" not in request.form:
+        return "Bad Request", BAD_REQUEST
+
     # verify auth token
-    token = ""
+
+    token = request.form["token"]
+
+    id = ""
+    try:
+        decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],
+                                                                  "verify_signature": True, "verify_exp": True})
+        id = decoded["sub"]
+        nonce = decoded["nonce"]
+
+        # check nonce
+        data_now = datetime.now()
+        expired_date = nonces[nonce]
+        if data_now > expired_date:
+            del nonces[nonce]
+            return "not authorized", NOT_AUTHORIZED
+        nonces.pop(nonce)
+    except Exception:
+        return "not authorized", NOT_AUTHORIZED
 
     # create api token
-    return render_template("sso_success.html", url="", token=token)
+
+    json_token = createToken(id)
+
+    api_token = jwt.encode(json_token, TOKEN_SECRET, ALGORITHM)
+
+    return render_template("sso_success.html", url="/", token=api_token)
 
 
 # todo: remove debug = True

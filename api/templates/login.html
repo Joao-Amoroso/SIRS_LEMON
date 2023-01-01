@@ -44,6 +44,16 @@
                 method="post"
                 action="{{auth_url}}"
             >
+                <input
+                    type="hidden"
+                    value="{{ origin}}"
+                    name="origin"
+                />
+                <input
+                    type="hidden"
+                    value="{{ nonce }}"
+                    name="nonce"
+                />
                 <button
                     class="btn btn-primary w-100 btn-lg mt-1 d-flex align-items-center justify-content-center"
                     type="submit"

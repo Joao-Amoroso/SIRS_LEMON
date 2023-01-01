@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            http-equiv="X-UA-Compatible"
+            content="IE=edge"
+        />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+        />
+        <title>Lemon - sso</title>
+        <style>
+            .pulse > div {
+                animation: pulse-anim 1000ms ease-in-out infinite;
+            }
+            .pulse > *:nth-child(1) {
+                animation-delay: 0;
+            }
+            .pulse > *:nth-child(2) {
+                animation-delay: 200ms;
+            }
+            .pulse > *:nth-child(3) {
+                animation-delay: 400ms;
+            }
+            .pulse > *:nth-child(4) {
+                animation-delay: 600ms;
+            }
+            .pulse > *:nth-child(5) {
+                animation-delay: 800ms;
+            }
+            @keyframes pulse-anim {
+                0% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0.4;
+                }
+            }
+        </style>
+    </head>
+    <body
+        class="container min-vh-100 d-flex justify-content-center align-items-center bg-light"
+    >
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+        ></script>
+
+        <div
+            class="w-100 d-flex flex-column align-items-center justify-content-center"
+            style="max-width: 400px"
+        >
+            <h1>
+                <svg
+                    class="bi mb-2"
+                    role="img"
+                    aria-label="Success:"
+                    style="width: 1.9em; height: 1.9em"
+                    viewBox="0 0 16 16"
+                    fill="#146c43"
+                >
+                    <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
+                    />
+                </svg>
+            </h1>
+            <h3>Your login was successful!</h3>
+            <p class="text-muted">You are being redirected to home page</p>
+            <h1
+                class="d-flex justify-content-center align-items-center mb-3 pulse"
+            >
+                <div
+                    class="rounded-circle bg-secondary m-1"
+                    style="width: 0.2em; height: 0.2em"
+                ></div>
+                <div
+                    class="rounded-circle bg-secondary m-1"
+                    style="width: 0.2em; height: 0.2em"
+                ></div>
+                <div
+                    class="rounded-circle bg-secondary m-1"
+                    style="width: 0.2em; height: 0.2em"
+                ></div>
+                <div
+                    class="rounded-circle bg-secondary m-1"
+                    style="width: 0.2em; height: 0.2em"
+                ></div>
+                <div
+                    class="rounded-circle bg-secondary m-1"
+                    style="width: 0.2em; height: 0.2em"
+                ></div>
+            </h1>
+        </div>
+        <script>
+            localStorage.setItem("lemon-token", "{{token}}");
+
+            window.location.href = "{{ url }}";
+        </script>
+    </body>
+</html>
