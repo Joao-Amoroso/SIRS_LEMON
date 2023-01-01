@@ -298,13 +298,12 @@ def login():
     nonce = token_hex(16)
 
     nonces[nonce] = datetime.now()+timedelta(minutes=NONCE_DURATION)
-    return render_template('login.html', auth_url="", nonce=nonce, origin=url_for(home))
+    return render_template('login.html', auth_url=AUTH_URL+'/login-page', nonce=nonce, origin=url_for(sso))
 
 
 @app.route('/register', methods=["GET"])
 def register():
-
-    return render_template('register.html')
+    return render_template('register.html', auth_url=AUTH_URL+'/register')
 
 
 def createToken(id):
