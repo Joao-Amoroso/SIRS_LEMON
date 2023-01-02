@@ -190,7 +190,7 @@
             function getPositions() {
                 let token = localStorage.getItem("lemon-token");
                 fetch("/vehicles/unlocked", {
-                    method: "POST",
+                    method: "GET",
                     mode: "cors", // no-cors, *cors, same-origin
                     headers: {
                         "Content-Type": "application/json",
