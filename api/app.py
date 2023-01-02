@@ -55,6 +55,12 @@ TOKEN_DURATION = 60
 TOKEN_SECRET = "7D1E6FC189DAFB2824448B277E11B"
 
 
+# Roles
+
+EMPLOYEE= "employee"
+CLIENT= "client"
+
+
 NONCE_DURATION = 10  # minutes
 
 
@@ -66,7 +72,6 @@ nonces = {}
 def check_nonces():
     global nonces
     date_now = datetime.now()
-    nonces.pop
     for key in nonces.keys():
         if date_now > nonces[key]:
             del nonces[key]
@@ -99,12 +104,12 @@ def get_vehicles():
     # check token
     token = authorization_header[7:]
 
-    id = ""
     try:
-        decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
 
-        id = decoded["sub"]
+        if decoded["role"] != EMPLOYEE:
+            raise Exception("You're not authorized")
     except Exception:
         return jsonify({"errors": [{"field": "token", "error": "your token is invalid"}]}), NOT_AUTHORIZED
 
@@ -113,16 +118,6 @@ def get_vehicles():
     try:
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        query = """select * from employee where employeeid = %s;"""
-        data = (id,)
-        cursor.execute(query, data)
-
-        record = cursor.fetchone()
-        print("cheguei aqui")
-        print(record)
-        if not record:
-            return "not authorized", NOT_AUTHORIZED
 
         query = """SELECT * from vehicle where vehicleid not in (select vehicleid from locked);
 """
@@ -138,7 +133,7 @@ def get_vehicles():
         print(res)
 
         return res
-    except Exception as e:
+    except Exception:
         return jsonify({"errors": [{"field": "get vehicles", "error": "Something went wrong, try again"}]}), 500
     finally:
         dbConn.commit()
@@ -306,14 +301,6 @@ def register():
     return render_template('register.html', auth_url=AUTH_URL+'/register')
 
 
-def createToken(id):
-    data_token = {
-        "sub": id,
-        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION)
-    }
-    return data_token
-
-
 @app.route('/SSO', methods=["POST"])
 def sso():
     if "token" not in request.form:
@@ -336,13 +323,46 @@ def sso():
         if data_now > expired_date:
             del nonces[nonce]
             return "not authorized", NOT_AUTHORIZED
-        nonces.pop(nonce)
+        del nonces[nonce]
     except Exception:
         return "not authorized", NOT_AUTHORIZED
 
     # create api token
 
-    json_token = createToken(id)
+    json_token =  {
+        "sub": id,
+        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION)
+    }
+    role = "client"
+
+    dbConn = None
+    cursor = None
+    try:
+        dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+        cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        query = """
+            SELECT * from employee where employeeid = %s;
+        """
+        data = (id,)
+
+        cursor.execute(query, data)
+
+        record = cursor.fetchone()
+
+        if not record:
+            role = "client"
+        else:
+            role = "employee"
+    except Exception as e:
+        print(e)
+        return jsonify({"errors": [{"field": "check role", "error": "Something went wrong, try again"}]}), 500
+    finally:
+        dbConn.commit()
+        cursor.close()
+        dbConn.close()
+
+    json_token["role"] = role
 
     api_token = jwt.encode(json_token, TOKEN_SECRET, ALGORITHM)
 
