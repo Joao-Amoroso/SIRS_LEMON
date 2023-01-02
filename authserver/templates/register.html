@@ -56,7 +56,11 @@
         <script src="https://unpkg.com/petite-vue"></script>
         <div class="w-100" style="max-width: 400px">
             <h1 class="d-flex justify-content-center align-items-center mb-3">
-                Auth
+                <img
+                    src="/static/shield.png"
+                    style="width: 1.9em; height: 1.9em"
+                    alt="Auth"
+                />
             </h1>
             <h1 class="text-center mb-4">Register</h1>
             <template id="form">
@@ -148,10 +152,10 @@
                             <span v-else>Register</span>
                         </button>
                     </form>
-                    <p class="text-center w-100 mt-3">
+                    <!-- <p class="text-center w-100 mt-3">
                         Already have an account?
                         <a class="link" href="/login">login here</a>
-                    </p>
+                    </p> -->
                 </div>
             </template>
             <div v-scope="Form()" @vue:mounted="checkToken"></div>
@@ -190,7 +194,7 @@
                             .then((res) => res.json())
                             .then((data) => {
                                 if (data["message"] === "ok") {
-                                    alert("success");
+                                    this.success = true;
                                 }
                             })
                             .catch((err) => {

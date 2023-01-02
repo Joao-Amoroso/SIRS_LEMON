@@ -23,6 +23,13 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
+        <script>
+            let token = localStorage.getItem("lemon-token");
+
+            if (token == null) {
+                window.location.href = "/login";
+            }
+        </script>
         <script src="https://unpkg.com/petite-vue"></script>
         <template id="menu">
             <div
@@ -200,6 +207,10 @@
                     .then((res) => res.json())
                     .then((data) => {
                         for (const row of data) {
+                            let infowindow = new google.maps.InfoWindow({
+                                content: `<h1> Vehicle</h1><p class="text-muted text-center">id: ${row.vehicleid}</p>`,
+                                ariaLabel: "Uluru"
+                            });
                             let marker = new google.maps.Marker({
                                 position: {
                                     lat: row.lat,
@@ -210,10 +221,11 @@
                             });
 
                             marker.addListener("click", (m) => {
-                                // compute route to m
+                                infowindow.open({ anchor: marker, map });
                             });
                         }
                     })
+
                     .catch((err) => {
                         console.log(err);
                     });

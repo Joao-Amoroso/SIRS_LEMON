@@ -88,12 +88,26 @@ atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/")
 def home():
-
+    
     return render_template('index.html')
 
-@app.route("/employee")
+@app.route("/employee",methods=["POST"])
 def employee():
-    return render_template("employee.html")
+    if "token" not in request.form:
+        return "Not authorized",NOT_AUTHORIZED
+    
+    token = request.form["token"]
+    try:
+        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
+                                                                  "verify_signature": True, "verify_exp": True})
+
+        if decoded["role"] == EMPLOYEE:
+            return render_template("employee.html")
+
+    except Exception:
+        return "Not authorized", NOT_AUTHORIZED
+
+    return "Not authorized", NOT_AUTHORIZED
 
 @app.route('/vehicles/unlocked')
 def get_vehicles():
@@ -133,7 +147,7 @@ def get_vehicles():
         res = []
         for record in rows:
             res.append(
-                {"vehicleid": record[0], "lat": record[1], "lgt": record[2]})
+                {"vehicleid": record[0], "lat": float(str(record[1])), "lgt": float(str(record[2]))})
         print(res)
 
         return res
@@ -313,8 +327,7 @@ def sso():
     # verify auth token
 
     token = request.form["token"]
-    print("token",token)
-    print("auth",AUTH_KEY)
+    
     id = ""
     try:
         decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],

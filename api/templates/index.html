@@ -2,14 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta
-            http-equiv="X-UA-Compatible"
-            content="IE=edge"
-        />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-        />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -54,11 +48,13 @@
     <body class="bg-light">
         <script>
             //TODO: fora de debug, dar uncomment
-            // let token = localStorage.getItem("lemon-token");
-            // if (token == null) {
-            //     window.location.href = "/login";
-            // }
+            let token = localStorage.getItem("lemon-token");
+            if (token == null) {
+                window.location.href = "/login";
+            }
         </script>
+        <script src="https://unpkg.com/petite-vue"></script>
+
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
@@ -77,14 +73,27 @@
                 />
                 <span class="text-white">Lemon</span>
             </h1>
+            <div class="d-flex align-items-center">
+                <form
+                    v-scope="Employee()"
+                    @vue:mounted="isEmployee()"
+                    action="/employee"
+                    method="post"
+                >
+                    <input type="hidden" name="token" :value="token" />
+                    <button
+                        v-if="employee == true"
+                        v-scope
+                        class="btn btn-light me-2"
+                    >
+                        Vehicles
+                    </button>
+                </form>
 
-            <button
-                v-scope
-                class="btn btn-primary"
-                @click="logout"
-            >
-                Log out
-            </button>
+                <button v-scope class="btn btn-primary" @click="logout">
+                    Log out
+                </button>
+            </div>
         </header>
         <main class="container w-100 min-vh-100 mb-5">
             <template id="form">
@@ -102,9 +111,7 @@
                     <form v-on:submit="submit">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label
-                                    for="vehicle-id"
-                                    class="form-label"
+                                <label for="vehicle-id" class="form-label"
                                     >Vehicle ID
                                 </label>
                                 <input
@@ -125,9 +132,7 @@
                             </div>
 
                             <div class="col-12">
-                                <label
-                                    for="duration"
-                                    class="form-label"
+                                <label for="duration" class="form-label"
                                     >Duration
                                     <small class="text-muted"
                                         >(days/hours/minutes)</small
@@ -155,6 +160,7 @@
                                         :value="durationDays"
                                         :disabled="isLoading"
                                         @input="handleDaysChange"
+                                        required
                                     />
                                     <span>/</span
                                     ><input
@@ -165,6 +171,7 @@
                                         :value="durationHours"
                                         :disabled="isLoading"
                                         @input="handleHoursChange"
+                                        required
                                     />
                                     <span>/</span>
                                     <input
@@ -175,6 +182,7 @@
                                         :value="durationMinutes"
                                         :disabled="isLoading"
                                         @input="handleMinutesChange"
+                                        required
                                     />
                                 </div>
                                 <div
@@ -203,9 +211,7 @@
                                     value="credit"
                                     v-model="paymentType"
                                 />
-                                <label
-                                    class="form-check-label"
-                                    for="credit"
+                                <label class="form-check-label" for="credit"
                                     >Credit card</label
                                 >
                             </div>
@@ -219,9 +225,7 @@
                                     value="debit"
                                     v-model="paymentType"
                                 />
-                                <label
-                                    class="form-check-label"
-                                    for="debit"
+                                <label class="form-check-label" for="debit"
                                     >Debit card</label
                                 >
                             </div>
@@ -229,9 +233,7 @@
 
                         <div class="row gy-3">
                             <div class="col-md-6">
-                                <label
-                                    for="cc-name"
-                                    class="form-label"
+                                <label for="cc-name" class="form-label"
                                     >Name on card</label
                                 >
                                 <input
@@ -241,6 +243,7 @@
                                     placeholder=""
                                     :disabled="isLoading"
                                     v-model="cardName"
+                                    required
                                 />
                                 <small class="text-muted"
                                     >Full name as displayed on card</small
@@ -251,9 +254,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label
-                                    for="cc-number"
-                                    class="form-label"
+                                <label for="cc-number" class="form-label"
                                     >Credit card number</label
                                 >
                                 <input
@@ -263,6 +264,7 @@
                                     placeholder="0000 0000 0000 0000"
                                     :disabled="isLoading"
                                     v-model="cardNumber"
+                                    required
                                 />
                                 <div class="invalid-feedback">
                                     Credit card number is required
@@ -270,9 +272,7 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label
-                                    for="cc-expiration"
-                                    class="form-label"
+                                <label for="cc-expiration" class="form-label"
                                     >Expiration</label
                                 >
                                 <input
@@ -282,6 +282,7 @@
                                     placeholder="MM/YY"
                                     :disabled="isLoading"
                                     v-model="expiration"
+                                    required
                                 />
                                 <div class="invalid-feedback">
                                     Expiration date required
@@ -289,9 +290,7 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label
-                                    for="cc-cvv"
-                                    class="form-label"
+                                <label for="cc-cvv" class="form-label"
                                     >CVV</label
                                 >
                                 <input
@@ -303,6 +302,7 @@
                                     placeholder="000"
                                     :disabled="isLoading"
                                     v-model="cvv"
+                                    required
                                 />
                                 <div class="invalid-feedback">
                                     Security code required
@@ -335,12 +335,8 @@
                     </form>
                 </div>
             </template>
-            <div
-                v-scope="Form()"
-                @vue:mounted="checkToken"
-            ></div>
+            <div v-scope="Form()"></div>
         </main>
-        <script src="https://unpkg.com/petite-vue"></script>
         <script>
             function Form(props) {
                 //TODO: adicionar requiered
@@ -489,11 +485,24 @@
                 console.log("logout");
 
                 localStorage.removeItem("lemon-token");
-                //TODO: dar uncomment para producao
                 window.location.href = "/login";
+                //TODO: dar uncomment para producao
+            }
+
+            function Employee(props) {
+                return {
+                    employee: false,
+                    token: localStorage.getItem("lemon-token"),
+                    async isEmployee() {
+                        let token = localStorage.getItem("lemon-token");
+                        let obj = JSON.parse(atob(token.split(".")[1]));
+                        this.employee = obj["role"] == "employee";
+                    }
+                };
             }
             PetiteVue.createApp({
                 Form,
+                Employee,
                 $delimiters: ["[[", "]]"]
             }).mount();
         </script>
