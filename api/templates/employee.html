@@ -10,6 +10,11 @@
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous"
         />
+        <style>
+            .active {
+                background-color: red;
+            }
+        </style>
         <title>Employee</title>
     </head>
     <body>
@@ -18,6 +23,121 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
+        <script src="https://unpkg.com/petite-vue"></script>
+        <template id="menu">
+            <div
+                class="position-fixed"
+                style="z-index: 20; top: 60px; left: 10px"
+            >
+                <div v-if="opened == true" class="card p-2">
+                    <div
+                        class="mb-3 d-flex align-items-center justify-content-between"
+                    >
+                        <div class="d-flex align-items-center">
+                            <button
+                                class="btn me-2 d-flex align-items-center justify-content-center"
+                                :class='{ "bg-primary": selected=="foot" }'
+                                v-on:click='selected = "foot"'
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 320 512"
+                                    width="20px"
+                                    height="20px"
+                                >
+                                    <Path
+                                        d="M256 48c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48s48 21.5 48 48zM126.5 199.3c-1 .4-1.9 .8-2.9 1.2l-8 3.5c-16.4 7.3-29 21.2-34.7 38.2l-2.6 7.8c-5.6 16.8-23.7 25.8-40.5 20.2s-25.8-23.7-20.2-40.5l2.6-7.8c11.4-34.1 36.6-61.9 69.4-76.5l8-3.5c20.8-9.2 43.3-14 66.1-14c44.6 0 84.8 26.8 101.9 67.9L281 232.7l21.4 10.7c15.8 7.9 22.2 27.1 14.3 42.9s-27.1 22.2-42.9 14.3L247 287.3c-10.3-5.2-18.4-13.8-22.8-24.5l-9.6-23-19.3 65.5 49.5 54c5.4 5.9 9.2 13 11.2 20.8l23 92.1c4.3 17.1-6.1 34.5-23.3 38.8s-34.5-6.1-38.8-23.3l-22-88.1-70.7-77.1c-14.8-16.1-20.3-38.6-14.7-59.7l16.9-63.5zM68.7 398l25-62.4c2.1 3 4.5 5.8 7 8.6l40.7 44.4-14.5 36.2c-2.4 6-6 11.5-10.6 16.1L54.6 502.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L68.7 398z"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                class="btn me-2 d-flex align-items-center justify-content-center"
+                                :class='{ "bg-primary": selected=="car" }'
+                                v-on:click='selected = "car"'
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20px"
+                                    height="20px"
+                                    viewBox="0 0 512 512"
+                                >
+                                    <Path
+                                        d="M135.2 117.4L109.1 192H402.9l-26.1-74.6C372.3 104.6 360.2 96 346.6 96H165.4c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32H346.6c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2V400v48c0 17.7-14.3 32-32 32H448c-17.7 0-32-14.3-32-32V400H96v48c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V400 256c0-26.7 16.4-49.6 39.6-59.2zM128 288c0-17.7-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32s32-14.3 32-32zm288 32c17.7 0 32-14.3 32-32s-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32z"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <button
+                            class="btn btn-close d-flex align-items-center justify-content-center"
+                            v-on:click="opened=false"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 320 512"
+                            >
+                                <path
+                                    d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mb-2 d-flex align-items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20px"
+                            height="20px"
+                            viewBox="0 0 512 512"
+                            fill="gray"
+                            class="me-2"
+                        >
+                            <Path
+                                d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48z"
+                            />
+                        </svg>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="Your current position"
+                            disabled
+                        />
+                    </div>
+                    <div class="mb-2 d-flex align-items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20px"
+                            height="20px"
+                            viewBox="0 0 384 512"
+                            fill="#EF4444"
+                            class="me-2"
+                        >
+                            <Path
+                                d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 256c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"
+                            />
+                        </svg>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <button class="btn btn-primary" v-on:click="search()">
+                        Search
+                    </button>
+                </div>
+
+                <button class="btn btn-light" v-else v-on:click="opened=true">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 448 512"
+                        fill="black"
+                        width="20px"
+                        height="20px"
+                    >
+                        <Path
+                            d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </template>
+
+        <div v-scope="Menu()" @vue:mounted="getPositions()"></div>
         <div id="map" style="height: 100vh"></div>
 
         <!-- 
@@ -27,7 +147,7 @@
          with https://www.npmjs.com/package/@googlemaps/js-api-loader.
         -->
         <script
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+            src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&v=weekly"
             defer
         ></script>
 
@@ -35,19 +155,74 @@
             let map;
 
             function initMap() {
-                map = new google.maps.Map(document.getElementById("map"), {
-                    center: { lat: -34.397, lng: 150.644 },
-                    zoom: 8
-                });
+                navigator.geolocation.getCurrentPosition((p) => {
+                    let marker = new google.maps.Marker({
+                        position: {
+                            lat: p.coords.latitude,
+                            lng: p.coords.longitude
+                        },
+                        map,
+                        title: "Your here"
+                    });
 
-                new google.maps.Marker({
-                    position: { lat: -34.397, lng: 150.644 },
-                    map,
-                    title: "Hello World!"
+                    map.setCenter({
+                        lat: p.coords.latitude,
+                        lng: p.coords.longitude
+                    });
+                });
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: 38.748627, lng: -9.129622 },
+                    zoom: 14
                 });
             }
 
             window.initMap = initMap;
+        </script>
+        <script>
+            function Menu(props) {
+                return {
+                    $template: "#menu",
+                    selected: "foot",
+                    opened: false,
+                    search() {}
+                };
+            }
+            function getPositions() {
+                let token = localStorage.getItem("lemon-token");
+                fetch("/vehicles/unlocked", {
+                    method: "POST",
+                    mode: "cors", // no-cors, *cors, same-origin
+                    headers: {
+                        "Content-Type": "application/json",
+                        authorization: `Bearer ${token == null ? "" : token}`
+                    }
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        for (const row of data) {
+                            let marker = new google.maps.Marker({
+                                position: {
+                                    lat: row.lat,
+                                    lng: row.lgt
+                                },
+                                map,
+                                title: row.vehicleid
+                            });
+
+                            marker.addListener("click", (m) => {
+                                // compute route to m
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+
+            PetiteVue.createApp({
+                Menu,
+                $delimiters: ["[[", "]]"]
+            }).mount();
         </script>
     </body>
 </html>

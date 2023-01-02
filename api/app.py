@@ -90,6 +90,9 @@ def home():
 
     return render_template('index.html')
 
+@app.route("/employee")
+def employee():
+    return render_template("employee.html")
 
 @app.route('/vehicles/unlocked')
 def get_vehicles():

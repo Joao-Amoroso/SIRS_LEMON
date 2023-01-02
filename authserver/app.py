@@ -96,6 +96,13 @@ def login():
         cursor.close()
         dbConn.close()
 
+@app.route("/login/redirect",methods=["POST"])
+def login_redirect():
+    body = request.get_json()
+    
+    return render_template("login_redirect.html", url=body["origin"], token=jwt.encode(json_token, SECRET_KEY, ALGORITHM))
+
+
 
 @app.route('/register', methods=["POST", "GET"])
 def register():
