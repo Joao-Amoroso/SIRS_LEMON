@@ -29,7 +29,7 @@ DB_HOST = "localhost"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
 DB_PASSWORD = "postgres"
-DB_PORT = "5432"
+DB_PORT = "5433"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
@@ -65,7 +65,8 @@ NONCE_DURATION = 10  # minutes
 
 
 AUTH_URL = "http://127.0.0.1:81"
-HOST_URL = "127.0.0.1"
+HOST_URL = "http://127.0.0.1:80"
+HOST_IP = "127.0.0.1"
 nonces = {}
 
 
@@ -312,7 +313,8 @@ def sso():
     # verify auth token
 
     token = request.form["token"]
-
+    print("token",token)
+    print("auth",AUTH_KEY)
     id = ""
     try:
         decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],
@@ -322,12 +324,16 @@ def sso():
 
         # check nonce
         data_now = datetime.now()
+        
+
+        
         expired_date = nonces[nonce]
         if data_now > expired_date:
             del nonces[nonce]
             return "not authorized", NOT_AUTHORIZED
         del nonces[nonce]
-    except Exception:
+    except Exception as e:
+        print(e)
         return "not authorized", NOT_AUTHORIZED
 
     # create api token
@@ -369,10 +375,10 @@ def sso():
 
     api_token = jwt.encode(json_token, TOKEN_SECRET, ALGORITHM)
 
-    return render_template("sso_success.html", url="/", token=api_token)
+    return render_template("ssoSuccess.html", url="/", token=api_token)
 
 
 # todo: remove debug = True
 
 if __name__ == "__main__":
-    app.run(debug=True,host=HOST_URL, port=80)
+    app.run(debug=True,host=HOST_IP, port=80)

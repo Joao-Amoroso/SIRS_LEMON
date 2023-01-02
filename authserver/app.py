@@ -22,7 +22,7 @@ DB_HOST = "localhost"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
 DB_PASSWORD = "postgres"
-DB_PORT = "5432"
+DB_PORT = "5433"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
@@ -32,7 +32,7 @@ app = Flask(__name__)
 def createToken(id, nonce):
     data_token = {
         "sub": id,
-        "exp": (datetime.now() + timedelta(minutes=TOKEN_DURATION)).replace(tzinfo=timezone.utc).timestamp(),
+        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION),
         "nonce": nonce
     }
     return data_token
@@ -101,6 +101,7 @@ def login():
 def login_redirect():
     if "origin" not in request.form or "token" not in request.form :
         return "Bad request",400
+    print(request.form)
     return render_template("login_redirect.html", url=request.form["origin"], token=request.form["token"])
 
 

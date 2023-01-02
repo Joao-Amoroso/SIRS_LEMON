@@ -189,12 +189,12 @@
                         <a class="link" href="/register">register here</a>
                     </p>
                     <form
-                        action="/login_redirect"
+                        action="/login/redirect"
                         method="post"
                         ref="hiddenForm"
                     >
                         <input type="hidden" name="origin" value="{{origin}}" />
-                        <input type="hidden" name="token" value="[[token]]" />
+                        <input type="hidden" name="token" id="hiddenToken" />
                     </form>
                 </div>
             </template>
@@ -214,7 +214,7 @@
                     password: "",
                     token: "",
                     submit(e) {
-                        //e.preventDefault();
+                        e.preventDefault();
 
                         localStorage.setItem("lemon-token", "token");
                         //return;
@@ -238,7 +238,8 @@
                         })
                             .then((res) => res.json())
                             .then((data) => {
-                                this.token = data["token"];
+                                document.getElementById("hiddenToken").value =
+                                    data["token"];
                                 this.$refs.hiddenForm.submit();
                             })
                             .catch((err) => {
