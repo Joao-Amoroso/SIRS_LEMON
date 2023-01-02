@@ -188,7 +188,11 @@
                         Don't have an account?
                         <a class="link" href="/register">register here</a>
                     </p>
-                    <form action="/login_redirect" method="post" id="form">
+                    <form
+                        action="/login_redirect"
+                        method="post"
+                        ref="hiddenForm"
+                    >
                         <input type="hidden" name="origin" value="{{origin}}" />
                         <input type="hidden" name="token" value="[[token]]" />
                     </form>
@@ -210,10 +214,10 @@
                     password: "",
                     token: "",
                     submit(e) {
-                        e.preventDefault();
+                        //e.preventDefault();
 
                         localStorage.setItem("lemon-token", "token");
-                        return;
+                        //return;
                         this.isLoading = true;
                         this.usernameError = "";
                         this.passwordError = "";
@@ -232,10 +236,11 @@
                                 origin: "{{origin}}"
                             })
                         })
-                            .then((res) => {
-                                this.token = res;
+                            .then((res) => res.json())
+                            .then((data) => {
+                                this.token = data["token"];
+                                this.$refs.hiddenForm.submit();
                             })
-
                             .catch((err) => {
                                 this.generalError = err.message;
                             })
@@ -245,10 +250,6 @@
                     },
                     checkToken() {
                         console.log("corri");
-                        // let token = localStorage.getItem("lemon-token");
-                        // if (token != null) {
-                        //     window.location.href = "/";
-                        // }
                     }
                 };
             }
