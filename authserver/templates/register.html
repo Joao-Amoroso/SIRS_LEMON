@@ -188,7 +188,7 @@
                     username: "",
                     password: "",
                     submit(e) {
-                        const AUTH_URL = "http://localhost:5000";
+                        const AUTH_URL = "http://127.0.0.1:81";
                         e.preventDefault();
 
                         this.isLoading = true;
@@ -207,16 +207,6 @@
                                 password: this.password
                             })
                         })
-                            .then((res) => res.json())
-                            .then((data) => {
-                                console.log("data");
-
-                                localStorage.setItem(
-                                    "lemon-token",
-                                    JSON.stringify(data)
-                                );
-                                window.location.href = "/";
-                            })
                             .catch((err) => {
                                 this.generalError = err.message;
                             })
@@ -226,10 +216,6 @@
                     },
                     checkToken() {
                         console.log("corri");
-                        // let token = localStorage.getItem("lemon-token");
-                        // if (token != null) {
-                        //     window.location.href = "/";
-                        // }
                     }
                 };
             }

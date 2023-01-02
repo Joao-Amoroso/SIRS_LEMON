@@ -64,8 +64,8 @@ CLIENT= "client"
 NONCE_DURATION = 10  # minutes
 
 
-AUTH_URL = ""
-
+AUTH_URL = "http://127.0.0.1:81"
+HOST_URL = "127.0.0.1"
 nonces = {}
 
 
@@ -293,7 +293,7 @@ def login():
     nonce = token_hex(16)
 
     nonces[nonce] = datetime.now()+timedelta(minutes=NONCE_DURATION)
-    return render_template('login.html', auth_url=AUTH_URL+'/login-page', nonce=nonce, origin=url_for(sso))
+    return render_template('login.html', auth_url=AUTH_URL+'/login-page', nonce=nonce, origin=HOST_URL+url_for("sso"))
 
 
 @app.route('/register', methods=["GET"])
@@ -372,4 +372,4 @@ def sso():
 # todo: remove debug = True
 
 if __name__ == "__main__":
-    app.run(debug=True, port=80)
+    app.run(debug=True,host="127.0.0.1", port=80)

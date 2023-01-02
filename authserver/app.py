@@ -3,7 +3,7 @@ import psycopg2.extras
 from flask import Flask, request, redirect, render_template
 import json
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 import secrets
 from argon2 import low_level
 import base64
@@ -32,7 +32,7 @@ app = Flask(__name__)
 def createToken(id, nonce):
     data_token = {
         "sub": id,
-        "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION),
+        "exp": (datetime.now() + timedelta(minutes=TOKEN_DURATION)).replace(tzinfo=timezone.utc).timestamp(),
         "nonce": nonce
     }
     return data_token
@@ -84,10 +84,11 @@ def login():
 
         if hashed_pw != record[2]:
             return json.dumps({'message': "The password isn't correct", 'code': 401})
-
         json_token = createToken(record[1], body["nonce"])
-
-        return render_template("login_redirect.html", url=body["origin"], token=jwt.encode(json_token, SECRET_KEY, ALGORITHM))
+        # print(json_token)
+        tok = jwt.encode(json_token, SECRET_KEY, algorithm=ALGORITHM)
+        # print(tok)
+        return render_template("login_redirect.html", url=body["origin"], token=tok)
 
     except Exception as e:
         return json.dumps({'error': e})
@@ -147,4 +148,4 @@ def register():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=80)
+    app.run(debug=True, port=81)

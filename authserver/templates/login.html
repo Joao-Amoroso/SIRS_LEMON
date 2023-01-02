@@ -233,10 +233,10 @@
                     username: "",
                     password: "",
                     submit(e) {
-                        e.preventDefault();
+                        //e.preventDefault();
 
                         localStorage.setItem("lemon-token", "token");
-                        return;
+                        //return;
                         this.isLoading = true;
                         this.usernameError = "";
                         this.passwordError = "";
@@ -255,16 +255,6 @@
                                 origin: "{{origin}}"
                             })
                         })
-                            .then((res) => res.json())
-                            .then((data) => {
-                                console.log("data");
-
-                                localStorage.setItem(
-                                    "lemon-token",
-                                    JSON.stringify(data)
-                                );
-                                window.location.href = "/";
-                            })
                             .catch((err) => {
                                 this.generalError = err.message;
                             })
@@ -274,10 +264,6 @@
                     },
                     checkToken() {
                         console.log("corri");
-                        // let token = localStorage.getItem("lemon-token");
-                        // if (token != null) {
-                        //     window.location.href = "/";
-                        // }
                     }
                 };
             }
