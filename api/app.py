@@ -29,7 +29,7 @@ DB_HOST = "localhost"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
 DB_PASSWORD = "postgres"
-DB_PORT = "5433"
+DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 

@@ -54,6 +54,7 @@
             crossorigin="anonymous"
         ></script>
         <script src="https://unpkg.com/petite-vue"></script>
+        <script src="{{ url_for('static', filename='node_modules/argon2-browser/dist/argon2-bundled.min.js')}}"></script>
         <div class="w-100" style="max-width: 400px">
             <h1 class="d-flex justify-content-center align-items-center mb-3">
                 <img
@@ -213,7 +214,7 @@
                     username: "",
                     password: "",
                     token: "",
-                    submit(e) {
+                    async submit(e) {
                         e.preventDefault();
 
                         localStorage.setItem("lemon-token", "token");
@@ -222,7 +223,10 @@
                         this.usernameError = "";
                         this.passwordError = "";
                         this.generalError = "";
-
+                        let password = await argon2.hash({
+                            pass: this.password,
+                            salt: this.username + "lemon"
+                        });
                         fetch("/login", {
                             method: "POST",
                             mode: "cors", // no-cors, *cors, same-origin
@@ -231,7 +235,7 @@
                             },
                             body: JSON.stringify({
                                 username: this.username,
-                                password: this.password,
+                                password: password.hashHex,
                                 nonce: "{{nonce}}",
                                 origin: "{{origin}}"
                             })
@@ -254,6 +258,7 @@
                     }
                 };
             }
+
             PetiteVue.createApp({
                 Form,
                 $delimiters: ["[[", "]]"]
