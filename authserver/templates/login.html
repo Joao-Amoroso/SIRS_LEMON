@@ -240,8 +240,21 @@
                                 origin: "{{origin}}"
                             })
                         })
-                            .then((res) => res.json())
+                            .then((res) => {
+                                if (res.status != 200) {
+                                    res.text().then(
+                                        (d) => (this.generalError = d)
+                                    );
+
+                                    return null;
+                                }
+
+                                return res.json();
+                            })
                             .then((data) => {
+                                if (data == null) {
+                                    return;
+                                }
                                 document.getElementById("hiddenToken").value =
                                     data["token"];
                                 this.$refs.hiddenForm.submit();

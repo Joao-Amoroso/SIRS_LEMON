@@ -196,8 +196,21 @@
                                 password: password.hashHex
                             })
                         })
-                            .then((res) => res.json())
+                            .then((res) => {
+                                if (res.status != 200) {
+                                    res.text().then(
+                                        (d) => (this.generalError = d)
+                                    );
+
+                                    return null;
+                                }
+
+                                return res.json();
+                            })
                             .then((data) => {
+                                if (data == null) {
+                                    return;
+                                }
                                 if (data["message"] === "ok") {
                                     this.success = true;
                                 }
