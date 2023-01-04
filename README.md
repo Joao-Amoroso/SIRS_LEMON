@@ -4,6 +4,12 @@
 <img src="./images/lemon.png" alt="lemon logo" width="100px" />
 </p>
 
+Lemon is an international shared electric vehicle company that operates in Portugal since 2018, both with electric scooters and electric bicycles.
+
+Customers can look for and unlock these vehicles through a mobile app or a website, where they also perform the payment for the used services.
+
+Lemon's employees also have an internal app to pick up wrongly parked vehicles, which has access to their location through GPS and suggests the best course with Google Maps integration.
+
 Begin with an introductory paragraph that tells readers the purpose of your software and its major benefits.
 Give them a summary of the information you will include in your ReadMe using clearly defined sections.
 
@@ -13,9 +19,6 @@ This section expands on the introductory paragraph to give readers a better unde
 Include a brief description and answer the question, "what problem does this project solve?"
 
 ### Built With
-
-Include an outline of the technologies in the project, such as framework (Rails/iOS/Android), as well as programming language, database, links to any related projects (for example, whether this API has corresponding iOS or Android clients), links to online tools related to the application (such as the project web site, the shared file storage).
-If you mention something, please provide links.
 
 -   [Postgresql](https://www.postgresql.org/) - used for database
 -   [Flask](https://flask.palletsprojects.com/en/2.2.x/) - used to build every API
