@@ -57,12 +57,18 @@ def login():
 
     dbConn = None
     cursor = None
+    body = request.get_json()
+    
+    for e in ["username","password","nonce"]:
+        if e not in body:
+            return "bad request",400
 
     try:
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        body = request.get_json()
+        
+
 
         query = """SELECT * FROM client WHERE username =  %s;"""
         data = (body["username"],)
@@ -111,6 +117,10 @@ def register():
 
     if request.method == "GET":
         return render_template("register.html")
+
+    for e in ["username","password"]:
+        if e not in body:
+            return "bad request",400
 
     dbConn = None
     cursor = None

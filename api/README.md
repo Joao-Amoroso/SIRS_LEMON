@@ -37,13 +37,13 @@ pip install dependency
 To run the aplication in dev mode write
 
 ```bash
-flask run
+python app.py
 ```
 
 if you want to run in debug mode write instead
 
 ```bash
-flask --debug run
+python app.py --debug
 ```
 
 # Routes
@@ -52,10 +52,11 @@ All routes that the api handles
 
 -   **[login](#get-login)** : `GET /login`
 -   **[register](#get-register)** : `GET /register`
--   **[home](#get])** : `GET /`
+-   **[home](#get)** : `GET /`
 -   **[rent](#post-rent)** : `POST /rent`
 -   **[get vehicles unlocked](#get-vehiclesunlocked)** : `GET /vehicles/unlocked`
 -   **[update vehicle position](#put-vehiclesposition)** : `PUT /vehicles/position`
+-   **[sso](#post-sso)** : `POST /SSO`
 
 # GET /login
 
@@ -250,13 +251,39 @@ Example
 
 ### **code**: `400 BAD Request`
 
+# POST /SSO
+
+handles login
+
+## **Auth required** (need to be authenticated with Auth)
+
+## Request
+
+Data Constraints
+
+```json
+{
+    "token": "[valid jwt auth token]"
+}
+```
+
+## Response
+
+### **code**: `200 OK`
+
+**returns**: [`ssoSuccess.html`](./templates/ssoSuccess.html)
+
+### **code**: `400 BAD REQUEST`
+
+### **code**: `401 Unauthorized`
+
 # dependencies
 
 -   psycopg2
 -   flask
 -   pyjwt
 -   hmac
+-   hashlib
 -   python-dotenv
 -   requests
 -   pytest
--   bs4
