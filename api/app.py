@@ -338,13 +338,17 @@ def sso():
         # check nonce
         data_now = datetime.now()
         
-
-        
         expired_date = nonces[nonce]
         if data_now > expired_date:
             del nonces[nonce]
             return render_template("ssoFailed.html",url=url_for('login')), NOT_AUTHORIZED
         del nonces[nonce]
+
+        origin = decoded["to"]
+
+        if origin != HOST_URL+url_for("sso"):
+            return render_template("ssoFailed.html",url=url_for('login')), NOT_AUTHORIZED
+
     except Exception as e:
         print(e)
         

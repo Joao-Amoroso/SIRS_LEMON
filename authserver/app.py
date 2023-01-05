@@ -35,11 +35,12 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
 app = Flask(__name__)
 
 
-def createToken(id, nonce):
+def createToken(id, nonce,origin):
     data_token = {
         "sub": id,
         "exp": datetime.now() + timedelta(minutes=TOKEN_DURATION),
-        "nonce": nonce
+        "nonce": nonce,
+        "to": origin
     }
     return data_token
 
@@ -65,7 +66,7 @@ def login():
     cursor = None
     body = request.get_json()
     
-    for e in ["username","password","nonce"]:
+    for e in ["username","password","nonce","origin"]:
         if e not in body:
             return "bad request",BAD_REQUEST
 
@@ -98,7 +99,7 @@ def login():
         if hashed_pw != record[2]:
             return "The password isn't correct", BAD_REQUEST
 
-        json_token = createToken(record[1], body["nonce"])
+        json_token = createToken(record[1], body["nonce"],body["origin"])
         # print(json_token)
         tok = jwt.encode(json_token, SECRET_KEY, algorithm=ALGORITHM)
         # print(tok)
