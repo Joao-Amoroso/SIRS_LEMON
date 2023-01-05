@@ -34,8 +34,13 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
 
-AUTH_KEY = os.environ.get("AUTH_KEY")
-# AUTH_KEY=os.getenv("AUTH_KEY")
+
+#TODO: ver melhor isto
+f = open('authserverpublic.key', "rb")
+AUTH_PUBLIC_KEY = f.read()
+f.close
+
+# AUTH_PUBLIC_KEY=os.getenv("AUTH_PUBLIC_KEY")
 
 app = Flask(__name__)
 
@@ -47,12 +52,21 @@ app = Flask(__name__)
 
 NOT_AUTHORIZED = 401
 BAD_REQUEST = 400
-ALGORITHM = "HS256"
+ALGORITHM = "RS256"
 
 # token configs
 TOKEN_BYTES = 64
 TOKEN_DURATION = 60
-TOKEN_SECRET = "7D1E6FC189DAFB2824448B277E11B"
+
+
+f = open('APIserver.key', "rb")
+SERVER_PRIVATE_KEY = f.read()
+f.close
+
+f = open('APIserverpublic.key', "rb")
+SERVER_PUBLIC_KEY = f.read()
+f.close
+
 
 
 # Roles
@@ -104,7 +118,7 @@ def employee():
     
     token = request.form["token"]
     try:
-        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
 
         if decoded["role"] == EMPLOYEE:
@@ -129,7 +143,7 @@ def get_vehicles():
     token = authorization_header[7:]
 
     try:
-        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
 
         if decoded["role"] != EMPLOYEE:
@@ -191,7 +205,7 @@ def rent():
     token = authorization_header[7:]
     id = ""
     try:
-        decoded = jwt.decode(token, TOKEN_SECRET, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                       "verify_signature": True, "verify_exp": True})
         id = decoded["sub"]
     except Exception:
@@ -336,7 +350,7 @@ def sso():
     
     id = ""
     try:
-        decoded = jwt.decode(token, AUTH_KEY, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token, AUTH_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
         id = decoded["sub"]
         nonce = decoded["nonce"]
@@ -398,7 +412,7 @@ def sso():
 
     json_token["role"] = role
 
-    api_token = jwt.encode(json_token, TOKEN_SECRET, ALGORITHM)
+    api_token = jwt.encode(json_token, SERVER_PRIVATE_KEY, ALGORITHM)
 
     return render_template("ssoSuccess.html", url="/", token=api_token)
 

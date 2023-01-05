@@ -15,8 +15,18 @@ NOT_AUTHORIZED = 401
 BAD_REQUEST = 400
 
 # jwt configs
+
+f = open('authserver.key', "rb")
+AUTH_PRIVATE_KEY = f.read()
+f.close
+
+f = open('authserverpublic.key', "rb")
+AUTH_PUBLIC_KEY = f.read()
+f.close
+
+
 SECRET_KEY = "a"
-ALGORITHM = "HS256"
+ALGORITHM = "RS256"
 
 
 # token configs
@@ -112,7 +122,7 @@ def login():
 
         json_token = createToken(record[1], body["nonce"],body["origin"])
         # print(json_token)
-        tok = jwt.encode(json_token, SECRET_KEY, algorithm=ALGORITHM)
+        tok = jwt.encode(json_token, AUTH_PRIVATE_KEY, algorithm=ALGORITHM)
         # print(tok)
         return json.dumps({"token":tok}), 200
 
