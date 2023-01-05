@@ -24,13 +24,24 @@ TOKEN_BYTES = 64
 TOKEN_DURATION = 60
 
 # SGBD configs
-DB_HOST = "localhost"
+DB_HOST = "127.0.0.1"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
-DB_PASSWORD = "postgres"
-DB_PORT = "5433"
+DB_PASSWORD = ""
+DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
+
+
+
+
+
+
+HOST_URL = "https://10.0.1.5:80"
+HOST_IP = "10.0.1.5"
+
+
+
 
 app = Flask(__name__)
 
@@ -43,12 +54,12 @@ def createToken(id, nonce):
     }
     return data_token
 
-# @app.before_request
-# def before_request():
-#     if not request.is_secure:
-#         url = request.url.replace('http://', 'https://', 1)
-#         code = 301
-#         return redirect(url, code=code)
+@app.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 
 @app.route('/login-page', methods=["POST"])
@@ -179,4 +190,4 @@ def register():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=81)
+    app.run(debug=True,host=HOST_IP, port=80,ssl_context=("authserver.crt","authserver.key"))
