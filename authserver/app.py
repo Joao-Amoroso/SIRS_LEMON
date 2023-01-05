@@ -1,12 +1,18 @@
 import psycopg2
 import psycopg2.extras
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template,jsonify
 import json
 import jwt
 from datetime import datetime, timedelta,timezone
 import secrets
 from argon2 import low_level
 import base64
+
+
+# status codes
+
+NOT_AUTHORIZED = 401
+BAD_REQUEST = 400
 
 # jwt configs
 SECRET_KEY = "a"
@@ -57,12 +63,18 @@ def login():
 
     dbConn = None
     cursor = None
+    body = request.get_json()
+    
+    for e in ["username","password","nonce"]:
+        if e not in body:
+            return "bad request",BAD_REQUEST
 
     try:
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        body = request.get_json()
+        
+
 
         query = """SELECT * FROM client WHERE username =  %s;"""
         data = (body["username"],)
@@ -72,7 +84,7 @@ def login():
         record = cursor.fetchone()
 
         if not record:
-            return json.dumps({'message': 'Username does not exist', 'code': '401'})
+            return 'Username does not exist', BAD_REQUEST
 
         salt = record[3]
 
@@ -81,17 +93,21 @@ def login():
         byte_hashed_pw = low_level.hash_secret(pw_bytes, bytes(
             salt, 'utf-8'), type=low_level.Type.ID, time_cost=3, memory_cost=65536, parallelism=4, hash_len=64)
         hashed_pw = base64.b64encode(byte_hashed_pw).decode("utf-8")
+        
 
         if hashed_pw != record[2]:
-            return json.dumps({'message': "The password isn't correct", 'code': 401})
+            return "The password isn't correct", BAD_REQUEST
+
         json_token = createToken(record[1], body["nonce"])
         # print(json_token)
         tok = jwt.encode(json_token, SECRET_KEY, algorithm=ALGORITHM)
         # print(tok)
-        return json.dumps({"token":tok})
+        return json.dumps({"token":tok}), 200
 
     except Exception as e:
-        return json.dumps({'error': e})
+        print(e)
+        return jsonify({"errors": [{"field": "login", "error": "Something went wrong, try again"}]}), 500
+
     finally:
         dbConn.commit()
         cursor.close()
@@ -100,7 +116,7 @@ def login():
 @app.route("/login/redirect",methods=["POST"])
 def login_redirect():
     if "origin" not in request.form or "token" not in request.form :
-        return "Bad request",400
+        return "Bad request",BAD_REQUEST
     print(request.form)
     return render_template("login_redirect.html", url=request.form["origin"], token=request.form["token"])
 
@@ -112,6 +128,12 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
 
+    body = request.get_json()
+
+    for e in ["username","password"]:
+        if e not in body:
+            return "bad request",400
+
     dbConn = None
     cursor = None
 
@@ -119,7 +141,6 @@ def register():
         dbConn = psycopg2.connect(DB_CONNECTION_STRING)
         cursor = dbConn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        body = request.get_json()
 
         query = """SELECT * FROM client WHERE username =  %s;"""
         data = (body["username"],)
@@ -129,7 +150,7 @@ def register():
         record = cursor.fetchone()
 
         if record:
-            return json.dumps({'message': 'User already exists', 'code': '401'})
+            return 'User already exists', BAD_REQUEST
 
         query = """INSERT INTO client (username, id, hashed_password, salt) VALUES (%s, %s, %s, %s)"""
 
@@ -148,7 +169,9 @@ def register():
         return json.dumps({'message': 'ok'}), 200
 
     except Exception as e:
-        return json.dumps({'error': e})
+        print(e)
+        return jsonify({"errors": [{"field": "register", "error": "Something went wrong, try again"}]}), 500
+
     finally:
         dbConn.commit()
         cursor.close()

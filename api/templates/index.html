@@ -43,6 +43,9 @@
                     opacity: 0.6;
                 }
             }
+            #modalSuc {
+                background-color: #6c757d99;
+            }
         </style>
     </head>
     <body class="bg-light">
@@ -333,6 +336,36 @@
                             <span v-else>Rent</span>
                         </button>
                     </form>
+                    <div v-if="success" class="bg-secondary position-fixed">
+                        <div
+                            id="modalSuc"
+                            class="modal d-flex align-items-center justify-content-center"
+                            tabindex="-1"
+                            role="dialog"
+                        >
+                            <div class="modal-dialog">
+                                <div class="modal-content p-1">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            You rent a vehicle
+                                        </h5>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary d-block"
+                                            style="width: 100%"
+                                            data-bs-dismiss="modal"
+                                            @click="success = false"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </template>
             <div v-scope="Form()"></div>
@@ -454,9 +487,27 @@
                             })
                         })
                             .then((res) => {
-                                console.log(res);
                                 if (res.status == 401) {
                                     this.generalError = "Not authorized";
+                                    return null;
+                                }
+
+                                if (res.status == 400) {
+                                    console.log("aqui");
+                                    res.json()
+                                        .then((d) => {
+                                            console.log(d);
+                                            this.generalError =
+                                                d?.errors[0]?.error;
+                                        })
+                                        .catch((e) => {
+                                            console.log(e);
+                                            this.generalError = e.message;
+                                        });
+                                    return null;
+                                }
+                                if (res.status == 500) {
+                                    this.generalError = "try again";
                                     return null;
                                 }
                                 return res.json();
@@ -465,6 +516,7 @@
                                 if (data == null) {
                                     return;
                                 }
+                                this.success = true;
                                 console.log("data");
                             })
                             .catch((err) => {

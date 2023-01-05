@@ -29,7 +29,7 @@ DB_HOST = "localhost"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
 DB_PASSWORD = "postgres"
-DB_PORT = "5433"
+DB_PORT = "5433" 
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
@@ -73,7 +73,7 @@ nonces = {}
 def check_nonces():
     global nonces
     date_now = datetime.now()
-    for key in nonces.keys():
+    for key in list(nonces.keys()):
         if date_now > nonces[key]:
             del nonces[key]
 
@@ -195,7 +195,7 @@ def rent():
 
     for e in ["duration", "vehicleid", "payment_type", "name", "card_number", "cvv", "expiration"]:
         if e not in body:
-            return "bad request", BAD_REQUEST
+            return jsonify({"errors": [{"field": "rent", "error": "you didn't send the right arguments"}]}), BAD_REQUEST
 
     dbConn = None
     cursor = None
@@ -239,7 +239,7 @@ def rent():
         query = """ Insert into locked values ( %s, %s, %s, %s);
 """
 
-        data = (body["vehicleid"], id, datetime.datetime.now(), duration)
+        data = (body["vehicleid"], id, datetime.now(), duration)
         cursor.execute(query, data)
 
         return jsonify({'message': 'ok'}), 200
@@ -343,11 +343,13 @@ def sso():
         expired_date = nonces[nonce]
         if data_now > expired_date:
             del nonces[nonce]
-            return "not authorized", NOT_AUTHORIZED
+            return render_template("ssoFailed.html",url=url_for('login')), NOT_AUTHORIZED
         del nonces[nonce]
     except Exception as e:
         print(e)
-        return "not authorized", NOT_AUTHORIZED
+        
+        return render_template("ssoFailed.html",url=url_for('login')), NOT_AUTHORIZED
+
 
     # create api token
 
