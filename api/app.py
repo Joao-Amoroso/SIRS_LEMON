@@ -25,11 +25,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # DB_DATABASE = os.environ.get("DB_DATABASE")
 # DB_PASSWORD = os.environ.get("DB_PASSWORD")
 # DB_PORT = 5433
-DB_HOST = "localhost"
+DB_HOST = "127.0.0.1"
 DB_USER = "postgres"
 DB_DATABASE = "postgres"
-DB_PASSWORD = "postgres"
-DB_PORT = "5433" 
+DB_PASSWORD = ""
+DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
 
@@ -64,9 +64,9 @@ CLIENT= "client"
 NONCE_DURATION = 10  # minutes
 
 
-AUTH_URL = "http://127.0.0.1:81"
-HOST_URL = "http://127.0.0.1:80"
-HOST_IP = "127.0.0.1"
+AUTH_URL = "https://10.0.1.5:80"
+HOST_URL = "https://10.0.1.4:80"
+HOST_IP = "10.0.1.4"
 nonces = {}
 
 
@@ -85,7 +85,13 @@ scheduler.start()
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
 
-
+@app.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+    
 @app.route("/")
 def home():
     
@@ -400,4 +406,4 @@ def sso():
 # todo: remove debug = True
 
 if __name__ == "__main__":
-    app.run(debug=True,host=HOST_IP, port=80)
+    app.run(debug=True,host=HOST_IP, port=80,ssl_context=("APIserver.crt","APIserver.key"))
