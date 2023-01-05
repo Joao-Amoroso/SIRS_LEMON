@@ -79,6 +79,7 @@ NONCE_DURATION = 10  # minutes
 
 
 AUTH_URL = "https://10.0.1.5:80"
+
 HOST_URL = "https://10.0.1.4:80"
 HOST_IP = "10.0.1.4"
 nonces = {}

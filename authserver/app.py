@@ -47,7 +47,7 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
 
 
 
-HOST_URL = "https://10.0.1.5:80"
+HOST_URL = "https://10.0.1.5:80" 
 HOST_IP = "10.0.1.5"
 
 
@@ -201,4 +201,4 @@ def register():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host=HOST_IP, port=80,ssl_context=("authserver.crt","authserver.key"))
+    app.run(debug=True,host=HOST_IP, port=81,ssl_context=("authserver.crt","authserver.key"))
