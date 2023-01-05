@@ -1,0 +1,29 @@
+2022-12-31 15:21:48.762 WET [192] LOG:  starting PostgreSQL 15.1 on x86_64-conda-linux-gnu, compiled by x86_64-conda-linux-gnu-cc (conda-forge gcc 11.3.0-19) 11.3.0, 64-bit
+2022-12-31 15:21:48.764 WET [192] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2022-12-31 15:21:48.769 WET [192] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2022-12-31 15:21:48.773 WET [195] LOG:  database system was shut down at 2022-12-31 15:21:19 WET
+2022-12-31 15:21:48.778 WET [192] LOG:  database system is ready to accept connections
+2022-12-31 15:21:53.067 WET [200] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:21:59.268 WET [202] FATAL:  role "postgres" does not exist
+2022-12-31 15:22:02.483 WET [204] FATAL:  role "root" does not exist
+2022-12-31 15:22:07.257 WET [206] FATAL:  role "joaop" does not exist
+2022-12-31 15:22:11.382 WET [208] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:23:00.941 WET [220] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:24:48.912 WET [192] LOG:  could not open file "postmaster.pid": No such file or directory
+2022-12-31 15:24:48.913 WET [192] LOG:  performing immediate shutdown because data directory lock file is invalid
+2022-12-31 15:24:48.913 WET [192] LOG:  received immediate shutdown request
+2022-12-31 15:24:48.913 WET [290] FATAL:  could not open file "global/pg_filenode.map": No such file or directory
+2022-12-31 15:24:48.913 WET [192] LOG:  could not open file "postmaster.pid": No such file or directory
+2022-12-31 15:24:48.916 WET [192] LOG:  database system is shut down
+2022-12-31 15:26:16.819 WET [309] LOG:  starting PostgreSQL 15.1 on x86_64-conda-linux-gnu, compiled by x86_64-conda-linux-gnu-cc (conda-forge gcc 11.3.0-19) 11.3.0, 64-bit
+2022-12-31 15:26:16.820 WET [309] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2022-12-31 15:26:16.824 WET [309] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2022-12-31 15:26:16.829 WET [312] LOG:  database system was shut down at 2022-12-31 15:25:54 WET
+2022-12-31 15:26:16.834 WET [309] LOG:  database system is ready to accept connections
+2022-12-31 15:26:22.888 WET [317] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:26:27.860 WET [319] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:27:59.605 WET [331] FATAL:  database "joaoraposo" does not exist
+2022-12-31 15:28:13.229 WET [335] ERROR:  database "joaoraposo" already exists
+2022-12-31 15:28:13.229 WET [335] STATEMENT:  CREATE DATABASE joaoraposo
+2022-12-31 15:31:16.929 WET [310] LOG:  checkpoint starting: time
+2022-12-31 15:32:50.767 WET [310] LOG:  checkpoint complete: wrote 940 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=93.731 s, sync=0.089 s, total=93.838 s; sync files=259, longest=0.004 s, average=0.001 s; distance=4297 kB, estimate=4297 kB
