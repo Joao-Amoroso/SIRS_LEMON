@@ -172,7 +172,6 @@
                     username: "",
                     password: "",
                     async submit(e) {
-                        const AUTH_URL = "http://127.0.0.1:81";
                         e.preventDefault();
 
                         this.isLoading = true;
@@ -180,7 +179,7 @@
                         this.passwordError = "";
                         this.generalError = "";
 
-                        fetch(AUTH_URL + "/register", {
+                        fetch("/register", {
                             method: "POST",
                             mode: "cors", // no-cors, *cors, same-origin
                             headers: {

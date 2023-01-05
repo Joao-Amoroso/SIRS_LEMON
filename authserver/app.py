@@ -35,9 +35,9 @@ TOKEN_DURATION = 60
 
 # SGBD configs
 DB_HOST = "127.0.0.1"
-DB_USER = "postgres"
-DB_DATABASE = "postgres"
-DB_PASSWORD = ""
+DB_USER = "auth_lemon"
+DB_DATABASE = "auth_lemon"
+DB_PASSWORD = "auth_lemon"
 DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s" % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
@@ -122,12 +122,13 @@ def login():
 
         json_token = createToken(record[1], body["nonce"],body["origin"])
         # print(json_token)
-        tok = jwt.encode(json_token, AUTH_PRIVATE_KEY, algorithm=ALGORITHM)
+        tok = jwt.encode(json_token, AUTH_PRIVATE_KEY, algorithm=ALGORITHM).decode('utf-8')
         # print(tok)
         return json.dumps({"token":tok}), 200
 
     except Exception as e:
         print(e)
+        print(tok)
         return jsonify({"errors": [{"field": "login", "error": "Something went wrong, try again"}]}), 500
 
     finally:
@@ -201,4 +202,4 @@ def register():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host=HOST_IP, port=81,ssl_context=("authserver.crt","authserver.key"))
+    app.run(debug=True,host=HOST_IP, port=80,ssl_context=("authserver.crt","authserver.key"))
