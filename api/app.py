@@ -30,8 +30,9 @@ DB_USER = "lemon"
 DB_DATABASE = "lemon"
 DB_PASSWORD = "lemon"
 DB_PORT = "5432"
-DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
-    DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
+DB_CA_CERT = "caserver.crt"
+DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s sslmode='verify-full' sslrootcert='%s'" % (
+    DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT,DB_CA_CERT)
 
 
 
