@@ -121,15 +121,14 @@ def login():
             return "The password isn't correct", BAD_REQUEST
 
         json_token = createToken(record[1], body["nonce"],body["origin"])
-        # print(json_token)
+        
         tok = jwt.encode(json_token, AUTH_PRIVATE_KEY, algorithm=ALGORITHM).decode('utf-8')
-        # print(tok)
+
         return json.dumps({"token": tok}), 200
 
     except Exception as e:
         print(e)
-        print(tok)
-        return jsonify({"errors": [{"field": "login", "error": "Something went wrong, try again"}]}), 500
+        return "Something went wrong, try again", 500
 
     finally:
         dbConn.commit()
@@ -193,7 +192,7 @@ def register():
 
     except Exception as e:
         print(e)
-        return jsonify({"errors": [{"field": "register", "error": "Something went wrong, try again"}]}), 500
+        return "Something went wrong, try again", 500
 
     finally:
         dbConn.commit()

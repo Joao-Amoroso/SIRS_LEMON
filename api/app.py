@@ -353,12 +353,10 @@ def sso():
     id = ""
     try:
         
-        print("@@@@@@@@@@@@@@\n\n\n")
-        print(token)  
-        print("@@@@@@@@@@@@@@\n\n\n")
+        
         decoded = jwt.decode(token.encode('utf-8'), AUTH_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
-        print(decoded)
+        
         id = decoded["sub"]
         nonce = decoded["nonce"]
 
