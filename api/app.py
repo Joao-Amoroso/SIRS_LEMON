@@ -5,10 +5,6 @@ from flask import Flask, render_template, request, make_response, session, redir
 
 from secrets import token_hex
 
-import json
-
-import os
-
 import hmac
 import jwt
 from datetime import datetime, timedelta
@@ -20,11 +16,6 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # SGBD configs
-# DB_HOST = os.environ.get("DB_HOST")
-# DB_USER = os.environ.get("DB_USER")
-# DB_DATABASE = os.environ.get("DB_DATABASE")
-# DB_PASSWORD = os.environ.get("DB_PASSWORD")
-# DB_PORT = 5433
 DB_HOST = "10.0.4.6"
 DB_USER = "lemon"
 DB_DATABASE = "lemon"
@@ -36,12 +27,10 @@ DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s sslmode='v
 
 
 
-#TODO: ver melhor isto
 f = open('authserverpublic.key', "rb")
 AUTH_PUBLIC_KEY = f.read()
 f.close
 
-# AUTH_PUBLIC_KEY=os.getenv("AUTH_PUBLIC_KEY")
 
 app = Flask(__name__)
 
@@ -200,7 +189,6 @@ def rent():
         return "not authorized", NOT_AUTHORIZED
 
     authorization_header = request.headers["Authorization"]
-    # print(authorization_header)
     if authorization_header[:7] != "Bearer ":
         return "not authorized", NOT_AUTHORIZED
 
@@ -277,7 +265,6 @@ def rent():
 
 @app.route('/vehicles/position', methods=["PUT"])
 def vehicles_position():
-    # position,id, {hash(position,id)}signature
 
     body = request.get_json()
 
@@ -425,8 +412,6 @@ def sso():
 
     return render_template("ssoSuccess.html", url="/", token=api_token)
 
-
-# todo: remove debug = True
 
 if __name__ == "__main__":
     app.run(debug=True,host=HOST_IP, port=443,ssl_context=("APIserver.crt","APIserver.key"))
