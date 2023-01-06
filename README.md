@@ -29,11 +29,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What kind of **hardware** device and which **operating system** do you need to have to install the software.
-
-In this section also include detailed instructions for installing additiona software the application is dependent upon (such as PostgreSQL database, for example).
-
-To run our project we assume that any computer with [SEEDS labs](https://github.com/tecnico-sec/Setup/). Any other Operating System can be used with a similar setup flow.
+To run our project we assume that you are using a computer running the SEED labs VM, setup as described [here](https://github.com/tecnico-sec/Setup/). The most recent Ubuntu LTS distribution can be used with a similar setup flow.
 
 You need Python3 and Postgresql that can be installed with
 ```
@@ -53,51 +49,45 @@ Finally you can install the libraries needed:
 
 ### Installing
 
-Give step-by-step instructions on building and running the application on the development environment.
+1) Configure postgres on the lemon database VM to use the certificates distributed, by changing the values of postgres.conf . 
+        
+	    change:
+		    listen_address='*'
+		    (ADD SSL FILES after running chmod and chown on them to guarantee only postgres has access to them )
 
-Describe the step.
+    Change pg_hba.conf to allow connections from lemon API VM.
+        
+		host all all 10.0.4.0/24 "scram-sha-256"
+2) Restart the postgres database service 
+        
+        sudo service postgresql restart
+3) Load the schemas to the respective databases.
+4) Set the following firewall rules:
 
-```
-Give the command example
-```
+    lemon API / authentication API:
 
-And repeat.
+		sudo iptables -A INPUT -s 0/0 -p tcp --dport 80 -j ACCEPT
+		sudo iptables -A INPUT -s 0/0 -p tcp --dport 443 -j ACCEPT
+    lemon database:
+        
+		sudo iptables -A INPUT -s 10.0.4.0/24 -p tcp --dport 5432 -j ACCEPT
 
-```
-until finished
-```
 
-You can also add screenshots to show expected results, when relevant.
+## Running
 
-### Testing
+1) Re-set firewall rules,  since they are lost on boot
+2) Run respective app.py for the server in question, under the 'root' user to allow bind to low number ports. Ex for api:
 
-Explain how to run the automated tests for this system.
-
-Give users explicit instructions on how to run all necessary tests.
-Explain the libraries, such as JUnit, used for testing your software and supply all necessary commands.
-
-Explain what these tests test and why
-
-```
-Give an example command
-```
-
-## Demo
-
-Give a tour of the best features of the application.
-Add screenshots when relevant.
+        cd ~/SIRS_CODE/api
+        sudo python3 app.py
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system e.g. a host or a cloud provider.
-
-Mention virtualization/container tools and commands.
-
-```
-Give an example command
-```
-
-Provide instructions for connecting to servers and tell clients how to obtain necessary permissions.
+For deployment on a live server, one would have to:
+- get domains for the running machines
+- get certificates issued to those domains
+- distribute the certificates to the servers
+- change the domains inside the apps to match the servers' domains 
 
 ## Additional Information
 
