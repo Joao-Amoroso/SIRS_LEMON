@@ -78,9 +78,9 @@ CLIENT= "client"
 NONCE_DURATION = 10  # minutes
 
 
-AUTH_URL = "https://10.0.1.5:80"
+AUTH_URL = "https://10.0.1.5"
 
-HOST_URL = "https://10.0.1.4:80"
+HOST_URL = "https://10.0.1.4"
 HOST_IP = "10.0.1.4"
 nonces = {}
 
@@ -428,4 +428,4 @@ def sso():
 # todo: remove debug = True
 
 if __name__ == "__main__":
-    app.run(debug=True,host=HOST_IP, port=80,ssl_context=("APIserver.crt","APIserver.key"))
+    app.run(debug=True,host=HOST_IP, port=443,ssl_context=("APIserver.crt","APIserver.key"))
