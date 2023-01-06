@@ -25,10 +25,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # DB_DATABASE = os.environ.get("DB_DATABASE")
 # DB_PASSWORD = os.environ.get("DB_PASSWORD")
 # DB_PORT = 5433
-DB_HOST = "127.0.0.1"
-DB_USER = "postgres"
-DB_DATABASE = "postgres"
-DB_PASSWORD = ""
+DB_HOST = "10.0.4.6"
+DB_USER = "lemon"
+DB_DATABASE = "lemon"
+DB_PASSWORD = "lemon"
 DB_PORT = "5432"
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s port=%s " % (
     DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD, DB_PORT)
@@ -119,13 +119,14 @@ def employee():
     
     token = request.form["token"]
     try:
-        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token.encode('utf-8'), SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
 
         if decoded["role"] == EMPLOYEE:
             return render_template("employee.html")
 
-    except Exception:
+    except Exception as e:
+        print(e)
         return "Not authorized", NOT_AUTHORIZED
 
     return "Not authorized", NOT_AUTHORIZED
@@ -144,7 +145,7 @@ def get_vehicles():
     token = authorization_header[7:]
 
     try:
-        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token.encode('utf-8'), SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
 
         if decoded["role"] != EMPLOYEE:
@@ -206,7 +207,7 @@ def rent():
     token = authorization_header[7:]
     id = ""
     try:
-        decoded = jwt.decode(token, SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
+        decoded = jwt.decode(token.encode('utf-8'), SERVER_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                       "verify_signature": True, "verify_exp": True})
         id = decoded["sub"]
     except Exception:
@@ -351,8 +352,13 @@ def sso():
     
     id = ""
     try:
-        decoded = jwt.decode(token, AUTH_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
+        
+        print("@@@@@@@@@@@@@@\n\n\n")
+        print(token)  
+        print("@@@@@@@@@@@@@@\n\n\n")
+        decoded = jwt.decode(token.encode('utf-8'), AUTH_PUBLIC_KEY, ALGORITHM, options={"require": ["exp"],
                                                                   "verify_signature": True, "verify_exp": True})
+        print(decoded)
         id = decoded["sub"]
         nonce = decoded["nonce"]
 
@@ -403,6 +409,9 @@ def sso():
             role = "client"
         else:
             role = "employee"
+            
+            
+        print("role",role)
     except Exception as e:
         print(e)
         return jsonify({"errors": [{"field": "check role", "error": "Something went wrong, try again"}]}), 500
@@ -413,7 +422,7 @@ def sso():
 
     json_token["role"] = role
 
-    api_token = jwt.encode(json_token, SERVER_PRIVATE_KEY, ALGORITHM)
+    api_token = jwt.encode(json_token, SERVER_PRIVATE_KEY, ALGORITHM).decode("utf-8")
 
     return render_template("ssoSuccess.html", url="/", token=api_token)
 
