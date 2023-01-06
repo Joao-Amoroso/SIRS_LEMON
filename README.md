@@ -22,7 +22,6 @@ Include a brief description and answer the question, "what problem does this pro
 
 -   [Postgresql](https://www.postgresql.org/) - used for database
 -   [Flask](https://flask.palletsprojects.com/en/2.2.x/) - used to build every API
--   [React Native](https://reactnative.dev/) - tool used to create mobile apps
 
 ## Getting Started
 
@@ -34,9 +33,23 @@ What kind of **hardware** device and which **operating system** do you need to h
 
 In this section also include detailed instructions for installing additiona software the application is dependent upon (such as PostgreSQL database, for example).
 
+To run our project we assume that any computer with [SEEDS labs](https://github.com/tecnico-sec/Setup/). Any other Operating System can be used with a similar setup flow.
+
+You need Python3 and Postgresql that can be installed with
 ```
-Give installation command examples
+sudo apt install python3
+sudo apt install postgresql
 ```
+Now that you have python, installing pip can help installing the libraries needed
+
+```
+sudo apt install python3-pip
+```
+
+Finally you can install the libraries needed:
+ ```
+ pip install flask pyjwt Datetime secrets argon2-cffi hmac hashlib APScheduler
+ ```
 
 ### Installing
 
