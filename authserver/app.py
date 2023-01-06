@@ -124,7 +124,7 @@ def login():
         # print(json_token)
         tok = jwt.encode(json_token, AUTH_PRIVATE_KEY, algorithm=ALGORITHM)
         # print(tok)
-        return json.dumps({"token":tok}), 200
+        return json.dumps({"token": tok}), 200
 
     except Exception as e:
         print(e)
